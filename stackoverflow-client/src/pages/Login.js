@@ -15,10 +15,10 @@ function Login() {
           <input type="password" id="password" name="password" />
         </div>
         <div className="form-group">
-          <p>Create a new account? <Link to="/">Signup</Link></p>
+          <button type="submit">Login</button>
         </div>
         <div className="form-group">
-          <button type="submit">Login</button>
+          <p>Create a new account? <Link to="/">Signup</Link></p>
         </div>
       </form>
     </div>

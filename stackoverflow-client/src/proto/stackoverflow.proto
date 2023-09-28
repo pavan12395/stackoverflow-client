@@ -1,0 +1,233 @@
+syntax = "proto3";
+
+option java_package = "mlh.pavan.grpc";
+
+enum SKILL_NAME
+{
+  NO_SKILL = 0;
+  JAVA = 2;
+  PYTHON = 3;
+  MYSQL = 4;
+}
+
+enum SKILL_DIFFICULTY
+{
+  NO_DIFFICULTY = 0;
+  EASY = 1;
+  MEDIUM = 2;
+  HARD = 3;
+}
+
+enum StatusCode
+{
+  SUCCESS = 0;
+  INTERNAL_ERROR = 1;
+  DB_FAILURE = 2;
+}
+
+enum USER_STATUS
+{
+  INACTIVE = 0;
+  ACTIVE = 1;
+  QUESTION = 2;
+  ANSWER = 3;
+  CALL = 4;
+}
+
+message Authorization
+{
+  string accessToken = 1;
+  string refreshToken = 2;
+}
+message RequestHeaders{
+  Authorization authorization = 1;
+  User user = 2;
+}
+
+
+message ResponseHeaders{
+  StatusCode status  = 1;
+  repeated string errorMessages = 2;
+}
+
+message User
+{
+  uint64 userId = 1;
+  string userName = 2;
+  string description = 3;
+  repeated Skill skills = 4;
+}
+
+message Skill
+{
+  SKILL_NAME skillName = 1;
+  SKILL_DIFFICULTY difficulty = 2;
+}
+
+message GreetRequest{
+  string message = 1;
+}
+
+message GreetResponse{
+  string message = 1;
+}
+
+message SignUpRequest{
+  RequestHeaders requestHeaders = 1;
+  string userName = 2;
+  string password = 3;
+  string description = 4;
+  repeated Skill skills = 5;
+}
+
+message SignUpResponse{
+  ResponseHeaders responseHeaders = 1;
+  string accessToken = 2;
+  string refreshToken = 3;
+}
+
+message LoginRequest{
+  RequestHeaders requestHeaders = 1;
+  string userName = 2;
+  string password = 3;
+}
+
+message LoginResponse{
+  ResponseHeaders responseHeaders = 1;
+  string accessToken = 2;
+  string refreshToken = 3;
+}
+
+message CheckTokenRequest{
+  RequestHeaders requestHeaders = 1;
+}
+
+message CheckTokenResponse{
+  ResponseHeaders responseHeaders = 1;
+  User user = 2;
+}
+
+message GetTokenRequest{
+  RequestHeaders requestHeaders = 1;
+}
+
+message GetTokenResponse{
+  ResponseHeaders responseHeaders = 1;
+  string accessToken = 2;
+}
+
+message LogoutRequest{
+  RequestHeaders requestHeaders = 1;
+  uint32 userId = 2;
+}
+
+message LogoutResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message ChangePasswordRequest{
+  RequestHeaders requestHeaders = 1;
+  string password = 3;
+  string newPassword = 4;
+}
+
+message ChangePasswordResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message ChangeUserNameRequest{
+  RequestHeaders requestHeaders = 1;
+  string userName = 3;
+}
+
+message ChangeUserNameResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message ChangeDescriptionRequest{
+  RequestHeaders requestHeaders = 1;
+  string description = 3;
+}
+
+message ChangeDescriptionResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message ChangeSkillRequest{
+  RequestHeaders requestHeaders = 1;
+  Skill skill = 3;
+}
+
+message ChangeSkillResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message AddSkillRequest{
+  RequestHeaders requestHeaders = 1;
+  Skill skill = 3;
+}
+
+message AddSkillResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message DeleteSkillRequest{
+  RequestHeaders requestHeaders = 1;
+  SKILL_NAME skillName = 3;
+}
+
+message DeleteSkillResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message DeleteUserRequest{
+  RequestHeaders requestHeaders = 1;
+}
+
+message DeleteUserResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+message UpdateRatingRequest{
+  RequestHeaders requestHeaders = 1;
+  float rating = 3;
+}
+
+message UpdateRatingResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+
+message ChangeUserStatusRequest{
+  RequestHeaders requestHeaders = 1;
+  USER_STATUS status = 3;
+}
+
+message ChangeUserStatusResponse{
+  ResponseHeaders responseHeaders = 1;
+}
+
+service StackOverflow{
+  rpc Greet(GreetRequest) returns (GreetResponse);
+  rpc SignUp(SignUpRequest) returns (SignUpResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc GetToken(GetTokenRequest) returns (GetTokenResponse);
+  rpc CheckToken(CheckTokenRequest) returns (CheckTokenResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+  rpc ChangeUserName(ChangeUserNameRequest) returns (ChangeUserNameResponse);
+  rpc ChangeDescription(ChangeDescriptionRequest) returns (ChangeDescriptionResponse);
+  rpc ChangeSkill(ChangeSkillRequest) returns (ChangeSkillResponse);
+  rpc AddSkill(AddSkillRequest) returns (AddSkillResponse);
+  rpc DeleteSkill(DeleteSkillRequest) returns (DeleteSkillResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc UpdateRating(UpdateRatingRequest) returns (UpdateRatingResponse);
+  rpc ChangeUserStatus(ChangeUserStatusRequest) returns (ChangeUserStatusResponse);
+}
+
+
+
+
+
+
+

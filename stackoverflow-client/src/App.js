@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-
+import { Provider } from 'react-redux';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Question from './pages/Question';
@@ -8,10 +8,24 @@ import Answer from './pages/Answer';
 import Chat from './pages/Chat';
 import Home from './pages/Home';
 import Layout from './components/LayOut';
+import { useSelector,useDispatch} from 'react-redux';
+import {getGrpcClient} from './Utils/Utils';
+import { setGrpcClient } from './redux/actions';
 function App() {
+  const dispatch = useDispatch();
+  useEffect(()=>
+  {
+     const client = getGrpcClient();
+     console.log("Client : ",client);
+     dispatch(setGrpcClient(client));
+  },[]);
+  const isAuth = useSelector((state)=>state.isAuth);
   return (
+    <>
     <Router>
-      <Layout/>
+      {
+        isAuth && <Layout/>
+      }
         <Routes>
           <Route exact path="/" element={<Signup/>} />
           <Route exact path="/login" element={<Login/>} />
@@ -21,6 +35,7 @@ function App() {
           <Route exact path="/home" element={<Home/>} />
         </Routes>
     </Router>
+    </>
   );
 }
 

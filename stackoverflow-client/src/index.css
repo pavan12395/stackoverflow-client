@@ -27,7 +27,7 @@ body {
 .signup-container {
   background-color: #fff;
   border-radius: 8px;
-  padding: 20px;
+  padding: 30px;
   width: 300px; /* Adjust the width as needed */
   height: 50%; /* 50% of the viewport height */
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -193,3 +193,59 @@ button:hover {
   cursor: pointer;
 }
 
+/* index.css */
+
+/* Center the entire skills container */
+.skills-container {
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; */
+  /* min-height: 100vh; Set a minimal height to center vertically */
+  text-align: center;
+  padding: 20px; /* Add some padding for spacing */
+}
+
+/* Style the heading */
+.skills-container h2 {
+  font-size: 24px;
+  margin: 20px 0;
+}
+
+/* Style the skill form */
+.skill-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Style the select dropdowns */
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Style the add button */
+button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Style the skill list */
+.skill-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.skill-list li {
+  font-size: 18px;
+  margin: 10px 0;
+}
