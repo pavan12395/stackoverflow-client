@@ -31,6 +31,18 @@ const Skills = () => {
     }
   };
 
+  useEffect(()=>
+  {
+
+    const handleBeforeUnload = ()=>
+    {
+       dispatch(setSkills([]));
+       dispatch(setNewSkillName(''));
+       dispatch(setNewSkillDifficulty(''));
+    }
+    return handleBeforeUnload;
+  },[]);  
+
   return (
     <div className="skills-container">
       <h2>Skills</h2>

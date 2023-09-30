@@ -17,7 +17,7 @@ import {
   
   const initialState = {
     isAuth: false,
-    user: {name:"Pavan"},
+    user: null,
     loginError: null,
     signUpError: null,
     webRTCConnection: null,

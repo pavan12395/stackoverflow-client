@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {Route, Routes} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -9,23 +9,83 @@ import Chat from './pages/Chat';
 import Home from './pages/Home';
 import Layout from './components/LayOut';
 import { useSelector,useDispatch} from 'react-redux';
-import {getGrpcClient} from './Utils/Utils';
-import { setGrpcClient } from './redux/actions';
+import {checkTokenHandler, getGrpcClient,statusCodeCheck, store,getTokenHandler} from './Utils/Utils';
+import { setAuthStatus, setGrpcClient,setUser} from './redux/actions';
+import { useNavigate } from 'react-router-dom';
+import { FaWindowRestore } from 'react-icons/fa';
 function App() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isAuth = useSelector((state)=>state.isAuth);
+  console.log(isAuth);
+  const grpcClient = useSelector((state)=>state.grpcClient);
+  useEffect(()=>
+  {
+    const refreshToken = window.localStorage.getItem("refreshToken");
+    if(refreshToken!="" && !isAuth)
+    {
+      console.log("Executing!!!");
+      dispatch(setAuthStatus(true));
+    }
+  },[]);
+  useEffect(()=>
+  {
+    console.log("Executing!");
+    async function retryForToken()
+    {
+       const refreshToken = window.localStorage.getItem("refreshToken");
+       const response = await getTokenHandler(grpcClient,refreshToken);
+       console.log(response);
+       let errorMessage = statusCodeCheck(response);
+       if(errorMessage==null)
+       {
+          window.localStorage.setItem("accessToken",response.accesstoken);
+          getUserFromToken(false)
+       }
+       else
+       {
+          window.localStorage.setItem("accessToken",null);
+          window.localStorage.setItem("accessToken",null);
+          navigate("/");
+       }
+    }
+    async function getUserFromToken(retry)
+    {
+      const accessToken = window.localStorage.getItem("accessToken");
+      if(accessToken)
+      {
+          const response =await checkTokenHandler(grpcClient,accessToken,null);
+          let errorMessage = statusCodeCheck(response)
+          if(errorMessage!=null && retry)
+          {
+            await retryForToken();
+          }
+          else
+          {
+            dispatch(setUser(response.user));
+            navigate("/home");
+          }
+      }
+    }
+    async function authStatusListener()
+    {
+         if(grpcClient && isAuth)
+         {
+            await getUserFromToken(true);
+         }    
+    }
+     authStatusListener();
+  },[isAuth,grpcClient]);
   useEffect(()=>
   {
      const client = getGrpcClient();
-     console.log("Client : ",client);
+     console.log(client);
      dispatch(setGrpcClient(client));
   },[]);
-  const isAuth = useSelector((state)=>state.isAuth);
+  
   return (
     <>
-    <Router>
-      {
-        isAuth && <Layout/>
-      }
+    <Layout/>
         <Routes>
           <Route exact path="/" element={<Signup/>} />
           <Route exact path="/login" element={<Login/>} />
@@ -34,7 +94,6 @@ function App() {
           <Route exact path="/chat" element={<Chat/>} />
           <Route exact path="/home" element={<Home/>} />
         </Routes>
-    </Router>
     </>
   );
 }
