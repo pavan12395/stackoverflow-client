@@ -10,7 +10,10 @@ import {
     SET_NEWSKILL_NAME,
     SET_NEWSKILL_DIFFICULTY,
     SET_AVAILABLESKILLOPTIONS,
-    SET_GRPC_CLIENT
+    SET_GRPC_CLIENT,
+    SET_QUESTION_TITLE,
+    SET_QUESTION_DESCRIPTION,
+    SET_RATING_REWARD
   } from './actionTypes';
 
   import { Skills } from '../Constants/constants';
@@ -27,7 +30,10 @@ import {
     newSkillName : "",
     newSkillDifficulty : "",
     availableSkillOptions : Skills,
-    grpcClient : null
+    grpcClient : null,
+    questionTitle : "",
+    questionDescription : "",
+    questionRatingReward : 0.0
   };
   
   const reducer = (state = initialState, action) => {
@@ -95,6 +101,18 @@ import {
       case SET_GRPC_CLIENT:
         return{
           ...state,grpcClient : action.payload
+        }
+      case SET_QUESTION_TITLE:
+        return{
+          ...state,questionTitle:action.payload
+        }
+      case SET_QUESTION_DESCRIPTION:
+        return{
+          ...state,questionDescription:action.payload
+        }
+      case SET_RATING_REWARD:
+        return{
+          ...state,questionRatingReward:action.payload
         }
       default:
         return state;

@@ -1,6 +1,6 @@
 import { Skills } from '../Constants/constants';
 import {StackOverflowClient} from '../proto/stackoverflow_grpc_web_pb';
-import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest} from '../proto/stackoverflow_pb';
+import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest} from '../proto/stackoverflow_pb';
 import {SKILL_NAME,SKILL_DIFFICULTY,Skill} from '../proto/stackoverflow_pb';
 export function getGrpcClient()
 {
@@ -136,6 +136,29 @@ export async function logOutHandler(client,accessToken,refreshToken)
             if(err)
             {
                 console.log(err);
+            }
+            else
+            {
+                response = response.toObject();
+                resolve(response);
+            }
+        });
+    });
+    return response;
+}
+
+export async function loginHandler(client,username,password)
+{
+    let request = new LoginRequest();
+    request.setUsername(username);
+    request.setPassword(password);
+    let response = await new Promise((resolve,reject)=>
+    {
+        client.login(request,null,(err,response)=>
+        {
+            if(err)
+            {
+                reject(err.message);
             }
             else
             {

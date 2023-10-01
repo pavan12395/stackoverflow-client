@@ -1,19 +1,13 @@
 import React,{useEffect}  from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-
-
+import { useSelector } from 'react-redux';
+import { Protect } from '../components/Protect';
 export default function Answer()
 {    
-    const navigate = useNavigate();
-    const isAuth = useSelector(state=>state.isAuth);
-    useEffect(()=>
+    const user = useSelector(state=>state.user);
+    if(!user)
     {
-        if(!isAuth)
-        {
-          navigate("/");
-        }
-    },[]);
+        return <Protect/>
+    }
     return(
         <h1>Answer</h1>
     );

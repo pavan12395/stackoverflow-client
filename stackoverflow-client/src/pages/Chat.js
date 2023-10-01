@@ -1,19 +1,14 @@
 import React,{useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-
+import { Protect } from '../components/Protect';
 
 export default function Chat()
 {
-    const navigate = useNavigate();
-    const isAuth = useSelector(state=>state.isAuth);
-    useEffect(()=>
+    const user = useSelector(state=>state.user);
+    if(!user)
     {
-        if(!isAuth)
-        {
-        navigate("/");
-        }
-    },[]);
+        return <Protect/>
+    }
     return(
         <h1>Chat</h1>
     );
