@@ -3,7 +3,7 @@ import {useSelector,useDispatch} from 'react-redux';
 import { Protect } from '../components/Protect';
 import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
-import SimplePeer from 'simple-peer';
+import Peer from 'peerjs';
 import { changeUserStatusHandler } from '../Utils/Utils';
 import {setWebRTCConnection} from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
@@ -21,12 +21,17 @@ export default function Question()
     const dispatch = useDispatch();
     const buttonClickHandler = (e)=>
     {
-        e.preventDefault();
+      e.preventDefault();
+       if(questionTitle=="" || questionDescription=="" || questionRatingReward==0.0)
+       {
+          alert("Invalid values");
+          return;
+       }
         console.log("Clicked!");
-        const newPeer = new SimplePeer({initiator:true});
+        const newPeer = new Peer();
         dispatch(setWebRTCConnection(newPeer));
     }
-    const modalCloseHandler = (e)=>
+    const modalCloseHandler = async (e)=>
     {
        e.preventDefault();
        console.log("Clicked!");
@@ -39,6 +44,10 @@ export default function Question()
         console.log(e);
        }
        dispatch(setWebRTCConnection(null));
+       let accessToken = window.localStorage.getItem("accessToken");
+       let refreshToken = window.localStorage.getItem("refreshToken");
+       const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+       console.log(response);
        dispatch(setQuestionModal(""));
     }
     useEffect(()=>
@@ -47,16 +56,14 @@ export default function Question()
        if(webRTCConnection)
        {
           console.log("Executing");
-          webRTCConnection.on("signal",async (data)=>
+          webRTCConnection.on("open",async (id)=>
           {
-            if(data.type=="offer" && data.sdp!=null)
-            {
+            console.log("Opened");
               let accessToken = window.localStorage.getItem("accessToken");
               let refreshToken = window.localStorage.getItem("refreshToken");
-              const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,data);
+              const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id);
               console.log(response);
               dispatch(setQuestionModal("Waiting for Connection!"));
-            }
           });
           webRTCConnection.on("connect",()=>
           {
@@ -65,7 +72,7 @@ export default function Question()
           });
           webRTCConnection.on("close",()=>
           {
-            console.log("CLosed the connection!");
+            console.log("Closed the connection!");
           })
        }
     },[webRTCConnection]);
