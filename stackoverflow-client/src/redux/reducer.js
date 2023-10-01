@@ -13,7 +13,8 @@ import {
     SET_GRPC_CLIENT,
     SET_QUESTION_TITLE,
     SET_QUESTION_DESCRIPTION,
-    SET_RATING_REWARD
+    SET_RATING_REWARD,
+    SET_QUESTION_MODAL
   } from './actionTypes';
 
   import { Skills } from '../Constants/constants';
@@ -33,7 +34,8 @@ import {
     grpcClient : null,
     questionTitle : "",
     questionDescription : "",
-    questionRatingReward : 0.0
+    questionRatingReward : 0.0,
+    questionModal : ""
   };
   
   const reducer = (state = initialState, action) => {
@@ -113,6 +115,10 @@ import {
       case SET_RATING_REWARD:
         return{
           ...state,questionRatingReward:action.payload
+        }
+      case SET_QUESTION_MODAL:
+        return{
+          ...state,questionModal:action.payload
         }
       default:
         return state;

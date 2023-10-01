@@ -1,6 +1,6 @@
 import { Skills } from '../Constants/constants';
 import {StackOverflowClient} from '../proto/stackoverflow_grpc_web_pb';
-import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest} from '../proto/stackoverflow_pb';
+import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest,ChangeUserStatusRequest} from '../proto/stackoverflow_pb';
 import {SKILL_NAME,SKILL_DIFFICULTY,Skill} from '../proto/stackoverflow_pb';
 export function getGrpcClient()
 {
@@ -166,6 +166,34 @@ export async function loginHandler(client,username,password)
                 resolve(response);
             }
         });
+    });
+    return response;
+}
+
+export async function changeUserStatusHandler(client,accessToken,refreshToken,userStatus,secret)
+{
+    console.log(typeof secret);
+    let authorization = AuthorizationFunc(accessToken,refreshToken)
+    let requestHeaders = RequestHeadersFunc(authorization)
+    let request = new ChangeUserStatusRequest();
+    request.setRequestheaders(requestHeaders);
+    request.setStatus(userStatus);
+    request.setWebrtcsecret(JSON.stringify(secret));
+    console.log(request);
+    let response = await new Promise((resolve,reject)=>
+    {
+        client.changeUserStatus(request,null,(err,response)=>
+        {
+            if(err)
+            {
+                reject(err.message);
+            }
+            else
+            {
+                response = response.toObject();
+                resolve(response);
+            }
+        })
     });
     return response;
 }

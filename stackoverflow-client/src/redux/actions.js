@@ -1,5 +1,5 @@
 import {SET_ANSWER_ERROR,SET_AUTH_STATUS,SET_LOGIN_ERROR,SET_QUESTIONERS,SET_SIGNUP_ERROR,SET_SKILLS,SET_USER,SET_WEBRTC_CONNECTION,
-SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD} from './actionTypes';
+SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD, SET_QUESTION_MODAL} from './actionTypes';
 // Action creators
 export const setQuestioners = (data) => {
   return {
@@ -109,5 +109,13 @@ export const setRatingReward = (ratingReward)=>
   return {
     type : SET_RATING_REWARD,
     payload : ratingReward
+  }
+}
+
+export const setQuestionModal = (questionModal)=>
+{
+  return {
+    type : SET_QUESTION_MODAL,
+    payload : questionModal
   }
 }

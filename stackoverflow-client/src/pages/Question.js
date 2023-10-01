@@ -1,32 +1,74 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {useSelector,useDispatch} from 'react-redux';
 import { Protect } from '../components/Protect';
-import { setQuestionTitle,setQuestionDescription,setRatingReward } from '../redux/actions';
+import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal} from '../redux/actions';
+import {USER_STATUS} from '../proto/stackoverflow_pb';
 import SimplePeer from 'simple-peer';
-
+import { changeUserStatusHandler } from '../Utils/Utils';
+import {setWebRTCConnection} from '../redux/actions';
+import { useNavigate } from 'react-router-dom';
+import Modal from '../components/Modal';
 export default function Question()
 {
+    const navigate = useNavigate();
     const user = useSelector(state=>state.user);
+    const grpcClient = useSelector(state=>state.grpcClient);
     const questionTitle = useSelector(state=>state.questionTitle);
     const questionDescription = useSelector(state=>state.questionDescription);
     const questionRatingReward = useSelector(state=>state.questionRatingReward);
-    console.log(questionTitle);
-    console.log(questionDescription);
-    console.log(questionRatingReward);
+    const webRTCConnection = useSelector(state=>state.webRTCConnection);
+    const questionModal = useSelector(state=>state.questionModal);
+    const dispatch = useDispatch();
     const buttonClickHandler = (e)=>
     {
         e.preventDefault();
         console.log("Clicked!");
         const newPeer = new SimplePeer({initiator:true});
-        newPeer.on("signal",(data)=>
-        {
-           if(data.type=="offer" && data.sdp!=null)
-           {
-              
-           }
-        })
+        dispatch(setWebRTCConnection(newPeer));
     }
-    const dispatch = useDispatch();
+    const modalCloseHandler = (e)=>
+    {
+       e.preventDefault();
+       console.log("Clicked!");
+       try
+       {
+        webRTCConnection.destroy();
+       }
+       catch(e)
+       {
+        console.log(e);
+       }
+       dispatch(setWebRTCConnection(null));
+       dispatch(setQuestionModal(""));
+    }
+    useEffect(()=>
+    {
+      console.log("Executing 1",webRTCConnection);
+       if(webRTCConnection)
+       {
+          console.log("Executing");
+          webRTCConnection.on("signal",async (data)=>
+          {
+            if(data.type=="offer" && data.sdp!=null)
+            {
+              let accessToken = window.localStorage.getItem("accessToken");
+              let refreshToken = window.localStorage.getItem("refreshToken");
+              const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,data);
+              console.log(response);
+              dispatch(setQuestionModal("Waiting for Connection!"));
+            }
+          });
+          webRTCConnection.on("connect",()=>
+          {
+             console.log("Remote Client Connected!");
+             navigate("/chat");
+          });
+          webRTCConnection.on("close",()=>
+          {
+            console.log("CLosed the connection!");
+          })
+       }
+    },[webRTCConnection]);
     if(!user)
     {
         return <Protect/>
@@ -66,8 +108,8 @@ export default function Question()
               onChange={(e)=>{dispatch(setRatingReward(e.target.value))}}
               required
             /><br /><br />
-    
             <button type="submit" onClick={buttonClickHandler}>Connect!</button>
+            <Modal isOpen={questionModal!=""} message={questionModal} onClose={modalCloseHandler}/>
           </form>
         </div>
       );
