@@ -201,6 +201,7 @@ message UpdateRatingResponse{
 message ChangeUserStatusRequest{
   RequestHeaders requestHeaders = 1;
   USER_STATUS status = 3;
+  string webRTCSecret = 4;
 }
 
 message ChangeUserStatusResponse{

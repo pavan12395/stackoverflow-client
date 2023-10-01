@@ -1,8 +1,8 @@
-import React,{useEffect}  from 'react';
+import React from 'react';
 import {useSelector,useDispatch} from 'react-redux';
 import { Protect } from '../components/Protect';
 import { setQuestionTitle,setQuestionDescription,setRatingReward } from '../redux/actions';
-
+import SimplePeer from 'simple-peer';
 
 export default function Question()
 {
@@ -17,6 +17,14 @@ export default function Question()
     {
         e.preventDefault();
         console.log("Clicked!");
+        const newPeer = new SimplePeer({initiator:true});
+        newPeer.on("signal",(data)=>
+        {
+           if(data.type=="offer" && data.sdp!=null)
+           {
+              
+           }
+        })
     }
     const dispatch = useDispatch();
     if(!user)
