@@ -2,7 +2,7 @@ import React,{useEffect}  from 'react';
 import { useSelector,useDispatch} from 'react-redux';
 import Protect from '../components/Protect';
 import Questioner from '../components/Questioner';
-import { setQuestioners, setWebRTCConnection } from '../redux/actions';
+import { setQuestioners, setTypeOfUser, setWebRTCConnection } from '../redux/actions';
 import {changeUserStatusHandler, getUsersData} from '../Utils/Utils';
 import io from 'socket.io-client';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
@@ -43,7 +43,7 @@ export default function Answer()
         {
             socket.disconnect();
         }
-    },[]);
+    },[dispatch]);
     useEffect(()=>{
     const accessToken = window.localStorage.getItem("accessToken");
     const refreshToken = window.localStorage.getItem("refreshToken");
@@ -74,11 +74,10 @@ export default function Answer()
         let refreshToken = window.localStorage.getItem("refreshToken");
         if(webRTCConnection)
         {
-            webRTCConnection.on("connect",async ()=>
+            webRTCConnection.on("connection",async ()=>
             {
                 console.log("Remote Client Connected!");
                 await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
-                navigate("/chat");
             });
             webRTCConnection.on("close",async ()=>
             {
@@ -87,7 +86,7 @@ export default function Answer()
                 navigate("/home");
             });
         }
-    },[webRTCConnection,grpcClient]);
+    },[webRTCConnection,grpcClient,dispatch]);
     if(!user)
     {
         return <Protect/>

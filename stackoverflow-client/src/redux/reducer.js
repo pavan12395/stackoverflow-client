@@ -17,7 +17,10 @@ import {
     SET_QUESTION_MODAL,
     SET_PEER_CONNECTION,
     SET_MESSAGES,
-    SET_QUESTION_DETAILS
+    SET_QUESTION_DETAILS,
+    SET_FIRST_REMOTE_MESSAGE,
+    SET_REMOTE_CLIENT_NAME,
+    SET_TYPE_OF_USER
   } from './actionTypes';
 
   import { Skills } from '../Constants/constants';
@@ -41,7 +44,10 @@ import {
     questionModal : "",
     peerConnection : null,
     messages : [],
-    questionDetails : null
+    questionDetails : null,
+    firstRemoteMessage : true,
+    remoteClientName : null,
+    userType : ""
   };
   
   const reducer = (state = initialState, action) => {
@@ -137,6 +143,18 @@ import {
       case SET_QUESTION_DETAILS:
         return{
           ...state,questionDetails:action.payload
+        }
+      case SET_FIRST_REMOTE_MESSAGE:
+        return {
+          ...state,firstRemoteMessage:action.payload
+        }
+      case SET_REMOTE_CLIENT_NAME:
+        return {
+          ...state,remoteClientName:action.payload
+        }
+      case SET_TYPE_OF_USER:
+        return {
+          ...state,userType : action.payload
         }
       default:
         return state;

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import {useSelector,useDispatch} from 'react-redux';
 import Protect from '../components/Protect';
-import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal, setPeerConnection, setQuestiondetails} from '../redux/actions';
+import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal, setPeerConnection, setQuestiondetails, setTypeOfUser} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
 import { changeUserStatusHandler } from '../Utils/Utils';
@@ -75,6 +75,7 @@ export default function Question()
              console.log("Remote Client Connected!");
              await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
              dispatch(setPeerConnection(connection));
+             dispatch(setTypeOfUser("QUESTIONER"));
              navigate("/chat");
           });
           webRTCConnection.on("close",async ()=>

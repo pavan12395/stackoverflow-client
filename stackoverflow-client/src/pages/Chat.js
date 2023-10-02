@@ -2,7 +2,7 @@
 import React, { useEffect,useRef} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Protect from '../components/Protect';
-import { setMessages, setPeerConnection } from '../redux/actions';
+import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRemoteClientName} from '../redux/actions';
 import { changeUserStatusHandler } from '../Utils/Utils';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import { useNavigate } from 'react-router-dom';
@@ -15,13 +15,21 @@ function Chat() {
   const grpcClient = useSelector((state)=>state.grpcClient);
   const questionDetails = useSelector((state)=>state.questionDetails);
   const messageRef = useRef();
+  const firstRemoteMessage = useSelector((state)=>state.firstRemoteMessage);
+  const remoteClientName = useSelector((state)=>state.remoteClientName);
+  const userType = useSelector(state=>state.userType);
+  console.log("User type : "+userType);
+  console.log("Remote client : "+remoteClientName);
+  console.log("Question Details : ",questionDetails);
+  console.log(firstRemoteMessage);
+  console.log(peerConnection);
   useEffect(() => {
     let accessToken = window.localStorage.getItem("accessToken");
     let refreshToken = window.localStorage.getItem("refreshToken");
     if (peerConnection) {
       peerConnection.on('data', (data) => {
-        const newMessage = { text: data, sender: 'remote' };
-        dispatch(setMessages([...messages,newMessage]));
+          const newMessage = { text: data, sender: 'remote' };
+          dispatch(setMessages([...messages,newMessage]));
       });
       peerConnection.on("close",async (data)=>
       {
@@ -45,20 +53,7 @@ function Chat() {
     {
         window.removeEventListener("beforeunload",unloadEventListener);
     }
-  }, [peerConnection,dispatch,messages]);
-  useEffect(()=>
-  {
-    if(questionDetails)
-    {
-      //Questioner
-      const firstMessage = {name : user.username , questionDetails : questionDetails};
-      peerConnection.send(JSON.stringify(firstMessage));
-    }
-    else
-    {
-
-    }
-  },[questionDetails,peerConnection,dispatch]);
+  }, [peerConnection,dispatch,messages,firstRemoteMessage]);
   const handleSend = () => {
     if (peerConnection) {
       peerConnection.send(messageRef.current.value); 

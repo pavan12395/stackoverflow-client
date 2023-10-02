@@ -1,5 +1,5 @@
 import {SET_ANSWER_ERROR,SET_AUTH_STATUS,SET_LOGIN_ERROR,SET_QUESTIONERS,SET_SIGNUP_ERROR,SET_SKILLS,SET_USER,SET_WEBRTC_CONNECTION,
-SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD, SET_QUESTION_MODAL, SET_PEER_CONNECTION, SET_MESSAGES, SET_QUESTION_DETAILS} from './actionTypes';
+SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD, SET_QUESTION_MODAL, SET_PEER_CONNECTION, SET_MESSAGES, SET_QUESTION_DETAILS, SET_FIRST_REMOTE_MESSAGE, SET_REMOTE_CLIENT_NAME, SET_TYPE_OF_USER} from './actionTypes';
 // Action creators
 export const setQuestioners = (data) => {
   return {
@@ -141,5 +141,29 @@ export const setQuestiondetails = (questionDetails)=>
   return {
     type : SET_QUESTION_DETAILS,
     payload : questionDetails
+  }
+}
+
+export const setFirstRemoteMessage = (firstRemoteMessage)=>
+{
+  return {
+    type : SET_FIRST_REMOTE_MESSAGE,
+    payload : firstRemoteMessage
+  }
+}
+
+export const setRemoteClientName = (remoteClientName)=>
+{
+  return {
+    type : SET_REMOTE_CLIENT_NAME,
+    payload  : remoteClientName
+  };
+}
+
+export const setTypeOfUser = (userType)=>
+{
+  return {
+    type : SET_TYPE_OF_USER,
+    payload : userType
   }
 }
