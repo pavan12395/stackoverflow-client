@@ -2,7 +2,7 @@ import React,{useEffect}  from 'react';
 import { useSelector,useDispatch} from 'react-redux';
 import Protect from '../components/Protect';
 import Questioner from '../components/Questioner';
-import { setQuestioners, setTypeOfUser, setWebRTCConnection } from '../redux/actions';
+import { setQuestioners,setWebRTCConnection } from '../redux/actions';
 import {changeUserStatusHandler, getUsersData} from '../Utils/Utils';
 import io from 'socket.io-client';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
@@ -72,19 +72,29 @@ export default function Answer()
     {
         let accessToken = window.localStorage.getItem("accessToken");
         let refreshToken = window.localStorage.getItem("refreshToken");
+        const connectionHandler = async ()=>
+        {
+            console.log("Remote Client Connected!");
+            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
+        }
+        const closeHandler = async ()=>
+        {
+            console.log("Closed the connection!");
+            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
+            navigate("/home");
+        }
         if(webRTCConnection)
         {
-            webRTCConnection.on("connection",async ()=>
+            webRTCConnection.on("connection",connectionHandler);
+            webRTCConnection.on("close",closeHandler);
+        }
+        return ()=>
+        {
+            if(webRTCConnection)
             {
-                console.log("Remote Client Connected!");
-                await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
-            });
-            webRTCConnection.on("close",async ()=>
-            {
-                console.log("Closed the connection!");
-                await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
-                navigate("/home");
-            });
+                webRTCConnection.off("connection",connectionHandler);
+                webRTCConnection.off("close",closeHandler);
+            }
         }
     },[webRTCConnection,grpcClient,dispatch]);
     if(!user)

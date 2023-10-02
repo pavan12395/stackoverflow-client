@@ -72,7 +72,7 @@ function Signup() {
           <p>Already a user? <Link to="/login">Login</Link></p>
         </div>
       </form>
-      <Modal isOpen={signUpError!=null && signUpError !== ''} message={signUpError} onClose={() => dispatch(setSignupError(''))} />
+      <Modal isOpen={signUpError!=null && signUpError !== ''} message={signUpError} onClose={() => dispatch(setSignupError(''))} displayClose={true}/>
     </div>
     </>
   );

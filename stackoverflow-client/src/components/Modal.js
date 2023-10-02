@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Modal = ({ isOpen, message, onClose }) => {
+const Modal = ({ isOpen, message, onClose,displayClose}) => {
   if (!isOpen) {
     return null;
   }
@@ -8,9 +8,11 @@ const Modal = ({ isOpen, message, onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <button className="modal-close" onClick={onClose}>
+        {
+        displayClose && <button className="modal-close" onClick={onClose}>
           &times;
         </button>
+        }
         <div className="modal-content">
           <h1>{message}</h1>
         </div>

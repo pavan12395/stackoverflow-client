@@ -57,11 +57,15 @@ export default function Question()
     {
       let accessToken = window.localStorage.getItem("accessToken");
       let refreshToken = window.localStorage.getItem("refreshToken");
-      console.log("Executing 1",webRTCConnection);
-       if(webRTCConnection)
-       {
-          console.log("Executing");
-          webRTCConnection.on("open",async (id)=>
+        const connectionHandler = async (connection)=>
+          {
+             console.log("Remote Client Connected!");
+             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
+             dispatch(setPeerConnection(connection));
+             dispatch(setTypeOfUser("QUESTIONER"));
+             navigate("/chat");
+          };
+          const connectionOpenHandler = async (id)=>
           {
              console.log("Opened");
             const questionDetails = {title : questionTitle,description:questionDescription,rewardRating:questionRatingReward};
@@ -69,16 +73,8 @@ export default function Question()
               const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id,JSON.stringify(questionDetails));
               console.log(response);
               dispatch(setQuestionModal("Waiting for Connection!"));
-          });
-          webRTCConnection.on("connection",async (connection)=>
-          {
-             console.log("Remote Client Connected!");
-             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
-             dispatch(setPeerConnection(connection));
-             dispatch(setTypeOfUser("QUESTIONER"));
-             navigate("/chat");
-          });
-          webRTCConnection.on("close",async ()=>
+          }
+          const connectionCloseHandler = async ()=>
           {
             console.log("Closed the connection!");
             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
@@ -87,9 +83,26 @@ export default function Question()
             }
             dispatch(setPeerConnection(null));
             navigate("/home");
-          })
+          }
+      console.log("Executing 1",webRTCConnection);
+       if(webRTCConnection)
+       {
+          console.log("Executing");
+          
+          webRTCConnection.on("open",connectionOpenHandler);
+          webRTCConnection.on("connection",connectionHandler);
+          webRTCConnection.on("close",connectionCloseHandler)
        }
-    },[webRTCConnection,dispatch,grpcClient,questionDetails]);
+       return ()=>
+       {
+          if(webRTCConnection)
+          {
+            webRTCConnection.off("open",connectionOpenHandler);
+            webRTCConnection.off("close",connectionCloseHandler);
+            webRTCConnection.off("connection",connectionHandler);
+          }
+       }
+    },[webRTCConnection,dispatch,grpcClient,questionDetails,questionTitle,questionDescription,questionRatingReward]);
     useEffect(()=>
     {
       let accessToken = window.localStorage.getItem("accessToken");
@@ -102,6 +115,7 @@ export default function Question()
             webRTCConnection.destroy();
           }
           dispatch(setWebRTCConnection(null));
+          dispatch(setQuestionModal(""));
       }
       window.addEventListener("beforeunload",questionCleanUp);
       return ()=>
@@ -149,7 +163,7 @@ export default function Question()
               required
             /><br /><br />
             <button type="submit" onClick={buttonClickHandler}>Connect!</button>
-            <Modal isOpen={questionModal!=""} message={questionModal} onClose={modalCloseHandler}/>
+            <Modal isOpen={questionModal!=""} message={questionModal} onClose={modalCloseHandler} displayClose={true}/>
           </form>
         </div>
       );

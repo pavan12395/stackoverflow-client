@@ -5,7 +5,9 @@ import Protect from '../components/Protect';
 import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRemoteClientName} from '../redux/actions';
 import { changeUserStatusHandler } from '../Utils/Utils';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
+import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
+import QuestionDetails from '../components/QuestionDetails';
 function Chat() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,19 +28,45 @@ function Chat() {
   useEffect(() => {
     let accessToken = window.localStorage.getItem("accessToken");
     let refreshToken = window.localStorage.getItem("refreshToken");
-    if (peerConnection) {
-      peerConnection.on('data', (data) => {
-          const newMessage = { text: data, sender: 'remote' };
-          dispatch(setMessages([...messages,newMessage]));
-      });
-      peerConnection.on("close",async (data)=>
+    const closeEventListener = async (data)=>
+    {
+       alert("Connection closed");
+      await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+      dispatch(setMessages([]));
+      dispatch(setPeerConnection(null));
+      navigate("/home");
+    }
+    const dataEventListener = (data) => {
+      if(firstRemoteMessage)
       {
-         alert("Connection closed");
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
-        dispatch(setMessages([]));
-        dispatch(setPeerConnection(null));
-        navigate("/home");
-      })
+          if(userType=="ANSWERER")
+          {
+             data = JSON.parse(data);
+             console.log("FirstRemoteMessage  ANSWERER  : ",data);
+             dispatch(setRemoteClientName(data.name));
+             dispatch(setQuestiondetails(data.questionDetails));
+             const answererFirstSendMessage = {name : user.username};
+             console.log(answererFirstSendMessage);
+             peerConnection.send(JSON.stringify(answererFirstSendMessage));
+          }
+          else
+          {
+             data = JSON.parse(data);
+             console.log("FirstRemoteMessage QUESTIONER : ",data);
+             dispatch(setRemoteClientName(data.name));
+          }
+          dispatch(setFirstRemoteMessage(false));
+      } 
+      else
+      {
+       console.log("Recieved Data : ",data);
+         const newMessage = { text: data, sender: 'remote' };
+         dispatch(setMessages([...messages,newMessage]));
+      }
+     }
+    if (peerConnection) {
+      peerConnection.on('data',dataEventListener);
+      peerConnection.on("close",closeEventListener);
     }
     const unloadEventListener = async (e)=>
     {
@@ -52,12 +80,29 @@ function Chat() {
     return ()=>
     {
         window.removeEventListener("beforeunload",unloadEventListener);
+        if(peerConnection)
+        {
+          peerConnection.off("data",dataEventListener);
+          peerConnection.off("close",closeEventListener);
+        }
     }
-  }, [peerConnection,dispatch,messages,firstRemoteMessage]);
+  }, [peerConnection,dispatch,messages,firstRemoteMessage,remoteClientName,userType]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (userType === "QUESTIONER" && firstRemoteMessage) {
+        let questionerFirstSendMessage = { name: user.username, questionDetails: questionDetails };
+        peerConnection.send(JSON.stringify(questionerFirstSendMessage));
+        console.log("Sent by Questioner!");
+      }
+    }, 5000); // 20 seconds in milliseconds
+  
+    return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts
+  }, [userType, firstRemoteMessage, peerConnection, user, questionDetails]);
+  
   const handleSend = () => {
     if (peerConnection) {
       peerConnection.send(messageRef.current.value); 
-      const newMessage = { text: messageRef.current.value, sender: 'you' };
+      const newMessage = { text: messageRef.current.value, sender: 'you'};
       // Send the message to the remote peer
       dispatch(setMessages([...messages,newMessage]));
       messageRef.current.value="";
@@ -70,11 +115,13 @@ function Chat() {
   }
 
   return (
+    <>
+    <QuestionDetails/>
     <div className="chat-container">
       <div className="chat-messages">
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            {msg.text}
+            {msg.sender=="you" ? user.username + " "+msg.text : remoteClientName + " "+ msg.text}
           </div>
         ))}
       </div>
@@ -86,7 +133,9 @@ function Chat() {
         />
         <button onClick={handleSend}>Send</button>
       </div>
+      <Modal isOpen={firstRemoteMessage} message={"Loading!"} displayClose={false}/>
     </div>
+    </>
   );
 }
 

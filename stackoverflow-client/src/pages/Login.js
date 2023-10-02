@@ -49,7 +49,7 @@ function Login() {
           <p>Create a new account? <Link to="/">Signup</Link></p>
         </div>
       </form>
-      <Modal isOpen={loginError!=null && loginError!=""} message={loginError} onClose={()=>{dispatch(setLoginError(""))}}/>
+      <Modal isOpen={loginError!=null && loginError!=""} message={loginError} onClose={()=>{dispatch(setLoginError(""))}} displayClose={true}/>
     </div>
   );
 }
