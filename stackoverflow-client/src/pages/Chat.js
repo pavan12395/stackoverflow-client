@@ -2,8 +2,8 @@
 import React, { useEffect,useRef} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Protect from '../components/Protect';
-import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRemoteClientName} from '../redux/actions';
-import { changeUserStatusHandler } from '../Utils/Utils';
+import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRecievedRewardMessage,setRecievedRewardRating,setRemoteClientName, setTypeOfUser} from '../redux/actions';
+import { changeUserStatusHandler, statusCodeCheck,updateRatingHandler} from '../Utils/Utils';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ function Chat() {
   const messageRef = useRef();
   const firstRemoteMessage = useSelector((state)=>state.firstRemoteMessage);
   const remoteClientName = useSelector((state)=>state.remoteClientName);
+  const recievedRewardRating = useSelector(state=>state.recievedRewardRating);
   const userType = useSelector(state=>state.userType);
   console.log("User type : "+userType);
   console.log("Remote client : "+remoteClientName);
@@ -34,6 +35,28 @@ function Chat() {
       await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
       dispatch(setMessages([]));
       dispatch(setPeerConnection(null));
+      if(userType=="ANSWERER")
+      {
+          if(recievedRewardRating==0)
+          {
+            dispatch(setRecievedRewardMessage("Answerer is not Satisified with your assistance"));
+          }
+          else
+          {
+              const response = await updateRatingHandler(grpcClient,recievedRewardRating,accessToken,refreshToken);
+              console.log(response);
+              let errorMessage = statusCodeCheck(response);
+              console.log(errorMessage);
+              if(errorMessage)
+              {
+                dispatch(setRecievedRewardMessage("Error in Updating Rating"));
+              }
+              else
+              {
+                dispatch(setRecievedRewardMessage("User rewarded with rating : "+recievedRewardRating));
+              }
+          }
+      }
       navigate("/home");
     }
     const dataEventListener = (data) => {
@@ -70,8 +93,9 @@ function Chat() {
        else if(data.type=="reward")
        {
          console.log("Recieved a Reward type");
-         const rewardRating = data.rewardRating;
+         const rewardRating = data.rating;
          console.log("Recieved rewardRating of  : ",rewardRating);
+         dispatch(setRecievedRewardRating(rewardRating));
        }
       }
      }
@@ -86,6 +110,12 @@ function Chat() {
         dispatch(setMessages([]));
         peerConnection.close();
         dispatch(setPeerConnection(null));
+        // dispatch(setMessages([]));
+        // dispatch(setQuestiondetails(null));
+        // dispatch(setFirstRemoteMessage(true));
+        // dispatch(setRemoteClientName(null));
+        // dispatch(setTypeOfUser(""));
+        // dispatch(setRecievedRewardRating(0));
     }
     window.addEventListener("beforeunload",unloadEventListener);
     return ()=>
@@ -97,7 +127,7 @@ function Chat() {
           peerConnection.off("close",closeEventListener);
         }
     }
-  }, [peerConnection,dispatch,messages,firstRemoteMessage,remoteClientName,userType]);
+  }, [peerConnection,dispatch,messages,firstRemoteMessage,remoteClientName,userType,dispatch,recievedRewardRating]);
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (userType === "QUESTIONER" && firstRemoteMessage) {
@@ -127,6 +157,11 @@ function Chat() {
     peerConnection.send(JSON.stringify(newMessage));
     peerConnection.close();
   }
+  const closeHandler = (e)=>
+  {
+    e.preventDefault();
+    peerConnection.close();
+  }
   if(!user)
   {
     return <Protect/>
@@ -154,7 +189,7 @@ function Chat() {
       <Modal isOpen={firstRemoteMessage} message={"Loading!"} displayClose={false}/>
       <div className="button-container">
       {userType=="QUESTIONER" && <button className='connect-button' onClick={rewardHandler}>Reward</button>}
-      <button className='connect-button'>Close</button>
+      <button className='connect-button' onClick={closeHandler}>Close</button>
     </div>
     </div>
     

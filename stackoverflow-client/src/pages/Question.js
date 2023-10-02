@@ -63,6 +63,7 @@ export default function Question()
              await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
              dispatch(setPeerConnection(connection));
              dispatch(setTypeOfUser("QUESTIONER"));
+             dispatch(setQuestionModal(""));
              navigate("/chat");
           };
           const connectionOpenHandler = async (id)=>

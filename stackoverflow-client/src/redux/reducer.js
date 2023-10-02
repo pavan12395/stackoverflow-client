@@ -20,7 +20,9 @@ import {
     SET_QUESTION_DETAILS,
     SET_FIRST_REMOTE_MESSAGE,
     SET_REMOTE_CLIENT_NAME,
-    SET_TYPE_OF_USER
+    SET_TYPE_OF_USER,
+    SET_RECIEVED_REWARD_RATING,
+    SET_RECIEVED_REWARD_MESSAGE
   } from './actionTypes';
 
   import { Skills } from '../Constants/constants';
@@ -47,7 +49,9 @@ import {
     questionDetails : null,
     firstRemoteMessage : true,
     remoteClientName : null,
-    userType : ""
+    userType : "",
+    recievedRewardRating : 0,
+    recievedRewardMessage : ""
   };
   
   const reducer = (state = initialState, action) => {
@@ -155,6 +159,14 @@ import {
       case SET_TYPE_OF_USER:
         return {
           ...state,userType : action.payload
+        }
+      case SET_RECIEVED_REWARD_RATING:
+        return{
+          ...state,recievedRewardRating:action.payload
+        }
+      case SET_RECIEVED_REWARD_MESSAGE:
+        return{
+          ...state,recievedRewardMessage:action.payload
         }
       default:
         return state;

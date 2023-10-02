@@ -1,6 +1,6 @@
 import { Skills } from '../Constants/constants';
 import {StackOverflowClient} from '../proto/stackoverflow_grpc_web_pb';
-import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest,ChangeUserStatusRequest,GetUserDetailsByIdRequest} from '../proto/stackoverflow_pb';
+import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest,ChangeUserStatusRequest,GetUserDetailsByIdRequest,UpdateRatingRequest} from '../proto/stackoverflow_pb';
 import {SKILL_NAME,SKILL_DIFFICULTY,Skill} from '../proto/stackoverflow_pb';
 export function getGrpcClient()
 {
@@ -240,3 +240,30 @@ export async function getUsersData(client,data)
   console.log(finalData);
   return finalData;
 } 
+
+export async function updateRatingHandler(client,reward,accessToken,refreshToken)
+{
+    let authorization = AuthorizationFunc(accessToken,refreshToken)
+    let requestHeaders = RequestHeadersFunc(authorization)
+    let request =new UpdateRatingRequest();
+    console.log(request);
+    request.setRequestheaders(requestHeaders);
+    request.setRating(reward);
+    let response = await new Promise((resolve,reject)=>
+    {
+        client.updateRating(request,null,(err,response)=>
+        {
+            if(err)
+            {
+                reject(err.message);
+            }
+            else
+            {
+                response = response.toObject();
+                resolve(response);
+            }
+        })
+    });
+    console.log(response);
+    return response;
+}

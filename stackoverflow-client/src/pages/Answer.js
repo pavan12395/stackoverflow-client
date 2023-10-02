@@ -81,7 +81,6 @@ export default function Answer()
         {
             console.log("Closed the connection!");
             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
-            navigate("/home");
         }
         if(webRTCConnection)
         {
