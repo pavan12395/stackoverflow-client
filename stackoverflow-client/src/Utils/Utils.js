@@ -170,7 +170,7 @@ export async function loginHandler(client,username,password)
     return response;
 }
 
-export async function changeUserStatusHandler(client,accessToken,refreshToken,userStatus,secret)
+export async function changeUserStatusHandler(client,accessToken,refreshToken,userStatus,secret,questionDetails)
 {
     console.log(userStatus);
     console.log(typeof secret);
@@ -180,6 +180,7 @@ export async function changeUserStatusHandler(client,accessToken,refreshToken,us
     request.setRequestheaders(requestHeaders);
     request.setStatus(userStatus);
     request.setWebrtcsecret(JSON.stringify(secret));
+    request.setQuestiondetails(questionDetails);
     console.log(request);
     let response = await new Promise((resolve,reject)=>
     {
@@ -232,7 +233,7 @@ export async function getUsersData(client,data)
   for (const user of data) {
     console.log(user.id + " and " + user.status + " and " + user.webrtc_secret);
     const response = await getUserData(client, user.id);
-    const finalUser = { id: user.id, name: response.username, rating: response.rating, secret: user.webrtc_secret };
+    const finalUser = { id: user.id, name: response.username, rating: response.rating, secret: user.webrtc_secret,questionDetails: JSON.parse(user.question_details)};
     finalData.push(finalUser);
   }
 

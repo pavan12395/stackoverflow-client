@@ -16,7 +16,8 @@ import {
     SET_RATING_REWARD,
     SET_QUESTION_MODAL,
     SET_PEER_CONNECTION,
-    SET_MESSAGES
+    SET_MESSAGES,
+    SET_QUESTION_DETAILS
   } from './actionTypes';
 
   import { Skills } from '../Constants/constants';
@@ -39,7 +40,8 @@ import {
     questionRatingReward : 0.0,
     questionModal : "",
     peerConnection : null,
-    messages : []
+    messages : [],
+    questionDetails : null
   };
   
   const reducer = (state = initialState, action) => {
@@ -131,6 +133,10 @@ import {
       case SET_MESSAGES:
         return{
           ...state,messages:action.payload
+        }
+      case SET_QUESTION_DETAILS:
+        return{
+          ...state,questionDetails:action.payload
         }
       default:
         return state;

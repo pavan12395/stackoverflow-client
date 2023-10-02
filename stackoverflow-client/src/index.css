@@ -17,9 +17,9 @@ code {
 body {
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* display: flex;
+  /* justify-content: center;
+  align-items: center; */ 
   height: 100vh; /* 100% of the viewport height */
   background-color: #f0f0f0; /* Background color for the entire page */
 }
@@ -300,25 +300,96 @@ button {
 
 /* Additional styles for other modal elements can be added here */
 /* index.css */
-.questioner {
+
+/* Questioner.css */
+
+.questioner-container {
   display: flex;
-  align-items: center;
-  border-bottom: 1px solid #ccc;
-  padding: 10px;
+  justify-content: space-between;
+  align-items: flex-start;
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin: 15px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
 }
 
-.questioner-details {
-  flex: 1;
+.questioner-container:hover {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
 }
 
-.rating {
+.questioner-left {
+  flex-grow: 1;
+  padding-right: 15px;
+}
+
+.question-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.question-description {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.4;
+  overflow: hidden;
+  max-height: 1000px;
+
+}
+
+.expand-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.questioner-right {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .connect-button {
-  margin-left: 10px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
 }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.user-name {
+  font-size: 18px;
+  color: #FFF;
+  margin-right: 5px;
+}
+
+.user-rating {
+  display: flex;
+  align-items: center;
+}
+
+.star-icon {
+  font-size: 18px;
+  color: #f39c12;
+  margin-left: 5px;
+}
+
 
 
 /* Basic CSS for the chat application */

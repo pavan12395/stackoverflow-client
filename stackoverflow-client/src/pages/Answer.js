@@ -51,7 +51,7 @@ export default function Answer()
     {
             const newPeer = new Peer();
             dispatch(setWebRTCConnection(newPeer));
-            const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ANSWER,"");
+            const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ANSWER,"","");
             console.log(response);
     }
     effectCall();
@@ -60,7 +60,7 @@ export default function Answer()
         dispatch(setQuestioners([]));
         console.log("Connected Closed");
         dispatch(setWebRTCConnection(null));
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
     }
     window.addEventListener("beforeunload",unloadEventListener);
     return ()=>
@@ -77,13 +77,13 @@ export default function Answer()
             webRTCConnection.on("connect",async ()=>
             {
                 console.log("Remote Client Connected!");
-                await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"");
+                await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
                 navigate("/chat");
             });
             webRTCConnection.on("close",async ()=>
             {
                 console.log("Closed the connection!");
-                await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+                await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
                 navigate("/home");
             });
         }
@@ -92,6 +92,7 @@ export default function Answer()
     {
         return <Protect/>
     }
+    console.log(questioners);
     return(
         <div>
       {questioners.map((questioner) => (
@@ -101,6 +102,7 @@ export default function Answer()
           name={questioner.name}
           rating={questioner.rating}
           secret={questioner.secret}
+          questionDetails={questioner.questionDetails}
         />
       ))}
     </div>

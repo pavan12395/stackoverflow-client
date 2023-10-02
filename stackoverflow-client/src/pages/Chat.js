@@ -13,6 +13,7 @@ function Chat() {
   const user = useSelector(state=>state.user);
   const peerConnection = useSelector((state) => state.peerConnection);
   const grpcClient = useSelector((state)=>state.grpcClient);
+  const questionDetails = useSelector((state)=>state.questionDetails);
   const messageRef = useRef();
   useEffect(() => {
     let accessToken = window.localStorage.getItem("accessToken");
@@ -45,7 +46,19 @@ function Chat() {
         window.removeEventListener("beforeunload",unloadEventListener);
     }
   }, [peerConnection,dispatch,messages]);
+  useEffect(()=>
+  {
+    if(questionDetails)
+    {
+      //Questioner
+      const firstMessage = {name : user.username , questionDetails : questionDetails};
+      peerConnection.send(JSON.stringify(firstMessage));
+    }
+    else
+    {
 
+    }
+  },[questionDetails,peerConnection,dispatch]);
   const handleSend = () => {
     if (peerConnection) {
       peerConnection.send(messageRef.current.value); 

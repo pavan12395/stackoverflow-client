@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import {useSelector,useDispatch} from 'react-redux';
 import Protect from '../components/Protect';
-import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal, setPeerConnection} from '../redux/actions';
+import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal, setPeerConnection, setQuestiondetails} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
 import { changeUserStatusHandler } from '../Utils/Utils';
@@ -20,6 +20,7 @@ export default function Question()
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
     const questionModal = useSelector(state=>state.questionModal);
     const peerConnection = useSelector(state=>state.peerConnection);
+    const questionDetails = useSelector(state=>state.questionDetails);
     const dispatch = useDispatch();
     const buttonClickHandler = (e)=>
     {
@@ -48,7 +49,7 @@ export default function Question()
        dispatch(setWebRTCConnection(null));
        let accessToken = window.localStorage.getItem("accessToken");
        let refreshToken = window.localStorage.getItem("refreshToken");
-       const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+       const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
        console.log(response);
        dispatch(setQuestionModal(""));
     }
@@ -63,21 +64,23 @@ export default function Question()
           webRTCConnection.on("open",async (id)=>
           {
              console.log("Opened");
-              const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id);
+            const questionDetails = {title : questionTitle,description:questionDescription,rewardRating:questionRatingReward};
+            dispatch(setQuestiondetails(questionDetails));
+              const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id,JSON.stringify(questionDetails));
               console.log(response);
               dispatch(setQuestionModal("Waiting for Connection!"));
           });
           webRTCConnection.on("connection",async (connection)=>
           {
              console.log("Remote Client Connected!");
-             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"");
+             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
              dispatch(setPeerConnection(connection));
              navigate("/chat");
           });
           webRTCConnection.on("close",async ()=>
           {
             console.log("Closed the connection!");
-            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
             if(peerConnection){
             peerConnection.close();
             }
@@ -85,14 +88,14 @@ export default function Question()
             navigate("/home");
           })
        }
-    },[webRTCConnection,dispatch,grpcClient]);
+    },[webRTCConnection,dispatch,grpcClient,questionDetails]);
     useEffect(()=>
     {
       let accessToken = window.localStorage.getItem("accessToken");
       let refreshToken = window.localStorage.getItem("refreshToken");
       const questionCleanUp = async (e)=>
       {
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
           if(webRTCConnection)
           {
             webRTCConnection.destroy();

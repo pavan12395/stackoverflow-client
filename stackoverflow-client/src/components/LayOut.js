@@ -9,7 +9,6 @@ const LayOut = () => {
   const grpcClient = useSelector((state)=>state.grpcClient);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(user)
   if(!user)
   {
     return null;
