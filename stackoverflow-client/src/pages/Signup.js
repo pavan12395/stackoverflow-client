@@ -23,6 +23,7 @@ function Signup() {
     console.log("Clicked!");
         e.preventDefault();
         const response = await signUpHandler(grpcClient,userNameRef.current.value,passwordRef.current.value,descRef.current.value,skills);
+        console.log(response);
         let errorMessage = statusCodeCheck(response)
         if(errorMessage!=null)
         {

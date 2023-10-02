@@ -1,5 +1,5 @@
 import {SET_ANSWER_ERROR,SET_AUTH_STATUS,SET_LOGIN_ERROR,SET_QUESTIONERS,SET_SIGNUP_ERROR,SET_SKILLS,SET_USER,SET_WEBRTC_CONNECTION,
-SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD, SET_QUESTION_MODAL} from './actionTypes';
+SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD, SET_QUESTION_MODAL, SET_PEER_CONNECTION, SET_MESSAGES} from './actionTypes';
 // Action creators
 export const setQuestioners = (data) => {
   return {
@@ -118,4 +118,20 @@ export const setQuestionModal = (questionModal)=>
     type : SET_QUESTION_MODAL,
     payload : questionModal
   }
+}
+
+export const setPeerConnection = (peerConnection)=>
+{
+  return{
+    type : SET_PEER_CONNECTION,
+    payload : peerConnection
+  }
+}
+
+export const setMessages = (messages)=>
+{
+  return {
+    type : SET_MESSAGES,
+    payload : messages
+  };
 }

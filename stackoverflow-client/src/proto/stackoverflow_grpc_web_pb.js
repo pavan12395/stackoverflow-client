@@ -988,5 +988,66 @@ proto.StackOverflowPromiseClient.prototype.changeUserStatus =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.GetUserDetailsByIdRequest,
+ *   !proto.GetUserDetailsByIdResponse>}
+ */
+const methodDescriptor_StackOverflow_GetUserDetailsById = new grpc.web.MethodDescriptor(
+  '/StackOverflow/GetUserDetailsById',
+  grpc.web.MethodType.UNARY,
+  proto.GetUserDetailsByIdRequest,
+  proto.GetUserDetailsByIdResponse,
+  /**
+   * @param {!proto.GetUserDetailsByIdRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.GetUserDetailsByIdResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.GetUserDetailsByIdRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.GetUserDetailsByIdResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.GetUserDetailsByIdResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.StackOverflowClient.prototype.getUserDetailsById =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/StackOverflow/GetUserDetailsById',
+      request,
+      metadata || {},
+      methodDescriptor_StackOverflow_GetUserDetailsById,
+      callback);
+};
+
+
+/**
+ * @param {!proto.GetUserDetailsByIdRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.GetUserDetailsByIdResponse>}
+ *     Promise that resolves to the response
+ */
+proto.StackOverflowPromiseClient.prototype.getUserDetailsById =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/StackOverflow/GetUserDetailsById',
+      request,
+      metadata || {},
+      methodDescriptor_StackOverflow_GetUserDetailsById);
+};
+
+
 module.exports = proto;
 

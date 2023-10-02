@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import {useSelector,useDispatch} from 'react-redux';
-import { Protect } from '../components/Protect';
-import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal} from '../redux/actions';
+import Protect from '../components/Protect';
+import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal, setPeerConnection} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
 import { changeUserStatusHandler } from '../Utils/Utils';
 import {setWebRTCConnection} from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import { FaWindowRestore } from 'react-icons/fa';
 export default function Question()
 {
     const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function Question()
     const questionRatingReward = useSelector(state=>state.questionRatingReward);
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
     const questionModal = useSelector(state=>state.questionModal);
+    const peerConnection = useSelector(state=>state.peerConnection);
     const dispatch = useDispatch();
     const buttonClickHandler = (e)=>
     {
@@ -52,30 +54,55 @@ export default function Question()
     }
     useEffect(()=>
     {
+      let accessToken = window.localStorage.getItem("accessToken");
+      let refreshToken = window.localStorage.getItem("refreshToken");
       console.log("Executing 1",webRTCConnection);
        if(webRTCConnection)
        {
           console.log("Executing");
           webRTCConnection.on("open",async (id)=>
           {
-            console.log("Opened");
-              let accessToken = window.localStorage.getItem("accessToken");
-              let refreshToken = window.localStorage.getItem("refreshToken");
+             console.log("Opened");
               const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id);
               console.log(response);
               dispatch(setQuestionModal("Waiting for Connection!"));
           });
-          webRTCConnection.on("connect",()=>
+          webRTCConnection.on("connection",async (connection)=>
           {
              console.log("Remote Client Connected!");
+             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"");
+             dispatch(setPeerConnection(connection));
              navigate("/chat");
           });
-          webRTCConnection.on("close",()=>
+          webRTCConnection.on("close",async ()=>
           {
             console.log("Closed the connection!");
+            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+            peerConnection.close();
+            dispatch(setPeerConnection(null));
+            navigate("/home");
           })
        }
     },[webRTCConnection]);
+    useEffect(()=>
+    {
+      let accessToken = window.localStorage.getItem("accessToken");
+      let refreshToken = window.localStorage.getItem("refreshToken");
+      const questionCleanUp = async (e)=>
+      {
+        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+          if(webRTCConnection)
+          {
+            webRTCConnection.destroy();
+          }
+          dispatch(setWebRTCConnection(null));
+      }
+      window.addEventListener("beforeunload",questionCleanUp);
+      return ()=>
+      {
+        window.removeEventListener("beforeunload",questionCleanUp);
+      }
+    },[]);
     if(!user)
     {
         return <Protect/>

@@ -1,6 +1,6 @@
 import { Skills } from '../Constants/constants';
 import {StackOverflowClient} from '../proto/stackoverflow_grpc_web_pb';
-import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest,ChangeUserStatusRequest} from '../proto/stackoverflow_pb';
+import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest,ChangeUserStatusRequest,GetUserDetailsByIdRequest} from '../proto/stackoverflow_pb';
 import {SKILL_NAME,SKILL_DIFFICULTY,Skill} from '../proto/stackoverflow_pb';
 export function getGrpcClient()
 {
@@ -172,6 +172,7 @@ export async function loginHandler(client,username,password)
 
 export async function changeUserStatusHandler(client,accessToken,refreshToken,userStatus,secret)
 {
+    console.log(userStatus);
     console.log(typeof secret);
     let authorization = AuthorizationFunc(accessToken,refreshToken)
     let requestHeaders = RequestHeadersFunc(authorization)
@@ -198,14 +199,42 @@ export async function changeUserStatusHandler(client,accessToken,refreshToken,us
     return response;
 }
 
-export async function getUserData
-
-export async function getUsersData(data)
+export async function getUserData(client,id)
 {
-    return data.map((user)=>
+    let request = new GetUserDetailsByIdRequest();
+    request.setUserid(id);
+    console.log(request);
+    let response = await new Promise((resolve,reject)=>
     {
-        console.log(user.id+" and "+user.status+" and "+user.webrtc_secret);
+        client.getUserDetailsById(request,null,(err,response)=>
+        {
+            if(err)
+            {
+                reject(err.message)
+            }
+            else
+            {
+                response = response.toObject();
+                console.log(response);
+                resolve(response);
+            }
+        });
+    });
+    console.log(response);
+    return response;
+}
 
-        return user;
-    })
+export async function getUsersData(client,data)
+{
+    const finalData = [];
+  
+  for (const user of data) {
+    console.log(user.id + " and " + user.status + " and " + user.webrtc_secret);
+    const response = await getUserData(client, user.id);
+    const finalUser = { id: user.id, name: response.username, rating: response.rating, secret: user.webrtc_secret };
+    finalData.push(finalUser);
+  }
+
+  console.log(finalData);
+  return finalData;
 } 

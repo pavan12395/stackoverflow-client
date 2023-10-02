@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import {useSelector} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Protect } from '../components/Protect';
+import Protect from '../components/Protect';
 export default function Home()
 {
   const user = useSelector(state=>state.user);
