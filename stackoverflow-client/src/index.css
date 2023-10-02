@@ -366,6 +366,7 @@ button {
   border-radius: 5px;
   cursor: pointer;
   margin-top: 10px;
+  width:15%;
 }
 
 .user-info {
@@ -495,4 +496,11 @@ button:hover {
   content: '⭐';
   margin-right: 8px;
   color: gold;
+}
+
+.button-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width:100%;
 }

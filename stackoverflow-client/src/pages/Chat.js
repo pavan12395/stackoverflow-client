@@ -60,8 +60,19 @@ function Chat() {
       else
       {
        console.log("Recieved Data : ",data);
-         const newMessage = { text: data, sender: 'remote' };
+       data = JSON.parse(data);
+       if(data.type=="message")
+       {
+        const message = data.text;
+         const newMessage = { text: message, sender: 'remote' };
          dispatch(setMessages([...messages,newMessage]));
+       }
+       else if(data.type=="reward")
+       {
+         console.log("Recieved a Reward type");
+         const rewardRating = data.rewardRating;
+         console.log("Recieved rewardRating of  : ",rewardRating);
+       }
       }
      }
     if (peerConnection) {
@@ -101,14 +112,21 @@ function Chat() {
   
   const handleSend = () => {
     if (peerConnection) {
-      peerConnection.send(messageRef.current.value); 
-      const newMessage = { text: messageRef.current.value, sender: 'you'};
+      const newMessage = { text: messageRef.current.value, sender: 'you',type:"message"};
+      peerConnection.send(JSON.stringify(newMessage)); 
       // Send the message to the remote peer
       dispatch(setMessages([...messages,newMessage]));
       messageRef.current.value="";
     }
   };
-
+  
+  const rewardHandler = (e)=>
+  {
+    e.preventDefault();
+    const newMessage = {type:"reward",rating:questionDetails.rewardRating};
+    peerConnection.send(JSON.stringify(newMessage));
+    peerConnection.close();
+  }
   if(!user)
   {
     return <Protect/>
@@ -134,7 +152,12 @@ function Chat() {
         <button onClick={handleSend}>Send</button>
       </div>
       <Modal isOpen={firstRemoteMessage} message={"Loading!"} displayClose={false}/>
+      <div className="button-container">
+      {userType=="QUESTIONER" && <button className='connect-button' onClick={rewardHandler}>Reward</button>}
+      <button className='connect-button'>Close</button>
     </div>
+    </div>
+    
     </>
   );
 }
