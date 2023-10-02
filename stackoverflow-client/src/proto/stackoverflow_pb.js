@@ -6740,7 +6740,8 @@ proto.ChangeUserStatusRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     requestheaders: (f = msg.getRequestheaders()) && proto.RequestHeaders.toObject(includeInstance, f),
     status: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    webrtcsecret: jspb.Message.getFieldWithDefault(msg, 4, "")
+    webrtcsecret: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    questiondetails: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -6790,6 +6791,10 @@ proto.ChangeUserStatusRequest.deserializeBinaryFromReader = function(msg, reader
       var value = /** @type {string} */ (reader.readString());
       msg.setWebrtcsecret(value);
       break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setQuestiondetails(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -6838,6 +6843,13 @@ proto.ChangeUserStatusRequest.serializeBinaryToWriter = function(message, writer
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getQuestiondetails();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -6914,6 +6926,24 @@ proto.ChangeUserStatusRequest.prototype.getWebrtcsecret = function() {
  */
 proto.ChangeUserStatusRequest.prototype.setWebrtcsecret = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string questionDetails = 5;
+ * @return {string}
+ */
+proto.ChangeUserStatusRequest.prototype.getQuestiondetails = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.ChangeUserStatusRequest} returns this
+ */
+proto.ChangeUserStatusRequest.prototype.setQuestiondetails = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
 };
 
 
