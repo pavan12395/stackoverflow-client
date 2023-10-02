@@ -208,6 +208,16 @@ message ChangeUserStatusResponse{
   ResponseHeaders responseHeaders = 1;
 }
 
+message GetUserDetailsByIdRequest{
+  RequestHeaders requestHeaders = 1;
+}
+
+message GetUserDetailsByIdResponse{
+  ResponseHeaders responseHeaders = 1;
+  string username = 2;
+  double rating = 3;
+}
+
 service StackOverflow{
   rpc Greet(GreetRequest) returns (GreetResponse);
   rpc SignUp(SignUpRequest) returns (SignUpResponse);
@@ -224,7 +234,15 @@ service StackOverflow{
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
   rpc UpdateRating(UpdateRatingRequest) returns (UpdateRatingResponse);
   rpc ChangeUserStatus(ChangeUserStatusRequest) returns (ChangeUserStatusResponse);
+  rpc GetUserDetailsById(GetUserDetailsByIdRequest) returns (GetUserDetailsByIdResponse);
 }
+
+
+
+
+
+
+
 
 
 

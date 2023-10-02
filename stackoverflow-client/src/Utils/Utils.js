@@ -197,3 +197,15 @@ export async function changeUserStatusHandler(client,accessToken,refreshToken,us
     });
     return response;
 }
+
+export async function getUserData
+
+export async function getUsersData(data)
+{
+    return data.map((user)=>
+    {
+        console.log(user.id+" and "+user.status+" and "+user.webrtc_secret);
+
+        return user;
+    })
+} 
