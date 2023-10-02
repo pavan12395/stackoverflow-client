@@ -192,6 +192,7 @@ export async function changeUserStatusHandler(client,accessToken,refreshToken,us
             else
             {
                 response = response.toObject();
+                console.log("ChangeUSerSTatus " ,response)
                 resolve(response);
             }
         })

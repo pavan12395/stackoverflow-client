@@ -17,18 +17,10 @@ export default function Answer()
     const grpcClient = useSelector(state=>state.grpcClient);
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
     const navigate = useNavigate();
-    useEffect(()=>{
-    const accessToken = window.localStorage.getItem("accessToken");
-    const refreshToken = window.localStorage.getItem("refreshToken");
-    const socket = io('http://localhost:4000', { transports : ['websocket'] });
-    async function effectCall()
+    useEffect(()=>
     {
-            const newPeer = new Peer();
-            dispatch(setWebRTCConnection(newPeer));
-            const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ANSWER,"");
-            console.log(response);
-            console.log(socket);
-            socket.on("connect",()=>
+        const socket = io('http://localhost:4000', { transports : ['websocket'] });
+        socket.on("connect",()=>
             {
                 console.log("Connected!");
             })
@@ -41,16 +33,30 @@ export default function Answer()
             });
             socket.on("welcome",async (data)=>
             {
-                console.log("Recieved Data! ",data);
+                console.log("Recieved Data on Welcome ! ",data);
                 const userData = await getUsersData(grpcClient,data);
                 console.log(userData);
                 dispatch(setQuestioners(userData));
             })
+
+        return ()=>
+        {
+            socket.disconnect();
+        }
+    },[]);
+    useEffect(()=>{
+    const accessToken = window.localStorage.getItem("accessToken");
+    const refreshToken = window.localStorage.getItem("refreshToken");
+    async function effectCall()
+    {
+            const newPeer = new Peer();
+            dispatch(setWebRTCConnection(newPeer));
+            const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ANSWER,"");
+            console.log(response);
     }
     effectCall();
     const unloadEventListener = async ()=>
     {
-        socket.disconnect();
         dispatch(setQuestioners([]));
         console.log("Connected Closed");
         dispatch(setWebRTCConnection(null));
@@ -61,7 +67,7 @@ export default function Answer()
     {
         window.removeEventListener("beforeunload",unloadEventListener);
     }
-    },[]);
+    },[dispatch,grpcClient]);
     useEffect(()=>
     {
         let accessToken = window.localStorage.getItem("accessToken");
@@ -81,7 +87,7 @@ export default function Answer()
                 navigate("/home");
             });
         }
-    },[webRTCConnection]);
+    },[webRTCConnection,grpcClient]);
     if(!user)
     {
         return <Protect/>

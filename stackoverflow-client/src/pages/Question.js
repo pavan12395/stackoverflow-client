@@ -78,12 +78,14 @@ export default function Question()
           {
             console.log("Closed the connection!");
             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+            if(peerConnection){
             peerConnection.close();
+            }
             dispatch(setPeerConnection(null));
             navigate("/home");
           })
        }
-    },[webRTCConnection]);
+    },[webRTCConnection,dispatch,grpcClient]);
     useEffect(()=>
     {
       let accessToken = window.localStorage.getItem("accessToken");

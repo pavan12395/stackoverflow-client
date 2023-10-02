@@ -41,7 +41,7 @@ const Skills = () => {
        dispatch(setNewSkillDifficulty(''));
     }
     return handleBeforeUnload;
-  },[]);  
+  },[dispatch]);  
 
   return (
     <div className="skills-container">
