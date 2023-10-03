@@ -4,9 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import Protect from '../components/Protect';
 import { setRecievedRewardMessage } from '../redux/actions';
+import { changeUserStatusHandler } from '../Utils/Utils';
+import {USER_STATUS} from '../proto/stackoverflow_pb';
 export default function Home()
 {
   const user = useSelector(state=>state.user);
+  const grpcClient = useSelector(state=>state.grpcClient);
   const dispatch = useDispatch();
   const recievedRewardMessage = useSelector(state=>state.recievedRewardMessage);
   console.log(recievedRewardMessage);
@@ -16,6 +19,18 @@ export default function Home()
     dispatch(setRecievedRewardMessage(""));
   }
   const navigate = useNavigate();
+  useEffect(()=>
+    {
+      if(user){
+        const accessToken = window.localStorage.getItem("accessToken");
+        const refreshToken = window.localStorage.getItem("refreshToken");
+        const activateUserStatus = async ()=>
+        {
+            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
+        }
+        activateUserStatus();
+      }
+    },[grpcClient,user])
     if(!user)
     {
         return <Protect/>

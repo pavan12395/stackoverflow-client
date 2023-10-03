@@ -1,9 +1,10 @@
 import React from 'react';
 import { FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa'; // Import the icons you want to use
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import { setAuthStatus,setUser} from '../redux/actions';
-import { logOutHandler, statusCodeCheck } from '../Utils/Utils';
+import { changeUserStatusHandler, logOutHandler, statusCodeCheck } from '../Utils/Utils';
+import {USER_STATUS} from '../proto/stackoverflow_pb';
 const LayOut = () => {
   const user = useSelector((state) => state.user);
   const grpcClient = useSelector((state)=>state.grpcClient);
@@ -15,39 +16,13 @@ const LayOut = () => {
   }
   const logoutClickHandler = async (e)=>
   {
-    e.preventDefault();  
+    e.preventDefault();
+    await changeUserStatusHandler(grpcClient,window.localStorage.getItem("accessToken"),window.localStorage.getItem("refreshToken"),USER_STATUS.INACTIVE,"",null);  
     window.localStorage.setItem("accessToken","");
     window.localStorage.setItem("refreshToken","");
     dispatch(setAuthStatus(false));
     dispatch(setUser(null));
     navigate("/");  
-    // const accessToken = window.localStorage.getItem("accessToken");
-    // try{
-    // const response = await logOutHandler(grpcClient,accessToken,null);
-    // console.log("Logout Response : ",response);
-    // let errorMessage = statusCodeCheck(response);
-    // if(errorMessage!=null)
-    // {
-    //   console.log(errorMessage);
-    //   alert(errorMessage);
-    // }
-    // else
-    // {
-    //   window.localStorage.setItem("accessToken","");
-    //   window.localStorage.setItem("refreshToken","");
-    //    setAuthStatus(false);
-    //    setUser(null);
-    //    navigate("/");
-    // }}
-    // catch(err)
-    // {
-    //   console.log(err);
-    // }
-    // finally
-    // {
-       
-    // }
-    
   }
   return (
     <div className="user-header">
