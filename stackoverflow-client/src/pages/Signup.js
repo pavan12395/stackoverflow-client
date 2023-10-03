@@ -36,6 +36,7 @@ function Signup() {
            store("accessToken",response.accesstoken)
            store("refreshToken",response.refreshtoken)
            dispatch(setAuthStatus(true));
+           navigate("/home");
         }
   }
   useEffect(()=>
