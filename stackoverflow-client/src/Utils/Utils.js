@@ -9,6 +9,18 @@ export function getGrpcClient()
     return client;
 }
 
+export function checkJWTExpired(response)
+{
+    const errorMessage = response.responseheaders.errormessagesList[0];
+    if(errorMessage.startsWith("JWT expired at"))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 export async function signUpHandler(client,username,password,description,skills)
 {
     const request = new SignUpRequest();

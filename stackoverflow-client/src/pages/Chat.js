@@ -29,17 +29,27 @@ function Chat() {
   useEffect(() => {
     let accessToken = window.localStorage.getItem("accessToken");
     let refreshToken = window.localStorage.getItem("refreshToken");
+    const destroyState = async ()=>
+    {
+        console.log("Calling Destroy State");
+        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+        dispatch(setMessages([]));
+        peerConnection.close();
+        dispatch(setPeerConnection(null));
+        dispatch(setMessages([]));
+        dispatch(setQuestiondetails(null));
+        dispatch(setFirstRemoteMessage(true));
+        dispatch(setRemoteClientName(null));
+        dispatch(setTypeOfUser(""));
+        dispatch(setRecievedRewardRating(0));
+    }
     const closeEventListener = async (data)=>
     {
-       alert("Connection closed");
-      await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
-      dispatch(setMessages([]));
-      dispatch(setPeerConnection(null));
       if(userType=="ANSWERER")
       {
           if(recievedRewardRating==0)
           {
-            dispatch(setRecievedRewardMessage("Answerer is not Satisified with your assistance"));
+            dispatch(setRecievedRewardMessage("Questioner is not Satisified with your assistance"));
           }
           else
           {
@@ -57,6 +67,7 @@ function Chat() {
               }
           }
       }
+      await destroyState();
       navigate("/home");
     }
     const dataEventListener = (data) => {
@@ -106,16 +117,7 @@ function Chat() {
     const unloadEventListener = async (e)=>
     {
         e.returnValue = "Exit Chat ? ";
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
-        dispatch(setMessages([]));
-        peerConnection.close();
-        dispatch(setPeerConnection(null));
-        // dispatch(setMessages([]));
-        // dispatch(setQuestiondetails(null));
-        // dispatch(setFirstRemoteMessage(true));
-        // dispatch(setRemoteClientName(null));
-        // dispatch(setTypeOfUser(""));
-        // dispatch(setRecievedRewardRating(0));
+        await destroyState();
     }
     window.addEventListener("beforeunload",unloadEventListener);
     return ()=>
@@ -135,7 +137,7 @@ function Chat() {
         peerConnection.send(JSON.stringify(questionerFirstSendMessage));
         console.log("Sent by Questioner!");
       }
-    }, 5000); // 20 seconds in milliseconds
+    }, 1000); // 20 seconds in milliseconds
   
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts
   }, [userType, firstRemoteMessage, peerConnection, user, questionDetails]);
