@@ -22,6 +22,13 @@ export default function Question()
     const peerConnection = useSelector(state=>state.peerConnection);
     const questionDetails = useSelector(state=>state.questionDetails);
     const dispatch = useDispatch();
+    const destroyState = ()=>
+    {
+        dispatch(setQuestionDescription(""));
+        dispatch(setQuestionTitle(""));
+        dispatch(setQuestionModal(""));
+        dispatch(setRatingReward(0));
+    }
     const buttonClickHandler = (e)=>
     {
       e.preventDefault();
@@ -63,7 +70,7 @@ export default function Question()
              await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
              dispatch(setPeerConnection(connection));
              dispatch(setTypeOfUser("QUESTIONER"));
-             dispatch(setQuestionModal(""));
+             destroyState();
              navigate("/chat");
           };
           const connectionOpenHandler = async (id)=>
@@ -71,9 +78,9 @@ export default function Question()
              console.log("Opened");
             const questionDetails = {title : questionTitle,description:questionDescription,rewardRating:questionRatingReward};
             dispatch(setQuestiondetails(questionDetails));
-              const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id,JSON.stringify(questionDetails));
-              console.log(response);
-              dispatch(setQuestionModal("Waiting for Connection!"));
+            const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id,JSON.stringify(questionDetails));
+            console.log(response);
+            dispatch(setQuestionModal("Waiting for Connection!"));
           }
           const connectionCloseHandler = async ()=>
           {
@@ -83,6 +90,7 @@ export default function Question()
             peerConnection.close();
             }
             dispatch(setPeerConnection(null));
+            destroyState();
             navigate("/home");
           }
       console.log("Executing 1",webRTCConnection);
@@ -116,7 +124,7 @@ export default function Question()
             webRTCConnection.destroy();
           }
           dispatch(setWebRTCConnection(null));
-          dispatch(setQuestionModal(""));
+          destroyState();
       }
       window.addEventListener("beforeunload",questionCleanUp);
       return ()=>
