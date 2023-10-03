@@ -14,18 +14,15 @@ function Questioner({ id, name, rating, secret,questionDetails}) {
   const navigate = useNavigate();
   const buttonClickHandler = async (e)=>
   {
+    e.preventDefault();
     let accessToken = window.localStorage.getItem("accessToken");
     let refreshToken = window.localStorage.getItem("refreshToken");
-    e.preventDefault();
     await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"");
     const peerConnection = webRTCConnection.connect(secret);
     console.log(peerConnection);
     dispatch(setPeerConnection(peerConnection));
-    peerConnection.on("open",()=>
-    {
-        dispatch(setTypeOfUser("ANSWERER"));
-        navigate("/chat");
-    });
+    dispatch(setTypeOfUser("ANSWERER"));
+    navigate("/chat");
   } 
   return (
     <div className="questioner-container">

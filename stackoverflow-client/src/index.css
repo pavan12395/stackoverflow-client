@@ -14,16 +14,16 @@ code {
 
 
 /* index.css */
-body {
-  margin: 0;
-  padding: 0;
+/* body { */
+  /* margin: 0; */
+  /* padding: 0; */
   /* display: flex;
   /* justify-content: center;
   align-items: center; */ 
-  height: 100vh; /* 100% of the viewport height */
-  background-color: #f0f0f0; /* Background color for the entire page */
-  overflow-y: scroll;
-}
+  /* height: 100vh;  */
+  /* background-color: #f0f0f0;  */
+  /* overflow-y: scroll; */
+/* } */
 
 .signup-container {
   background-color: #fff;
