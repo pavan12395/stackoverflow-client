@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUser, FaCog, FaSignOutAlt} from 'react-icons/fa'; // Import the icons you want to use
+import { FaUser,FaSignOutAlt} from 'react-icons/fa'; // Import the icons you want to use
 import { useDispatch, useSelector } from 'react-redux';
 import {useNavigate } from 'react-router-dom';
 import { setAccessToken,setRefreshToken,setUser, setUserStatus} from '../redux/actions';
@@ -29,7 +29,6 @@ const LayOut = () => {
     <span className="user-name">{user.username}</span>
   </div>
   <div className="user-actions">
-    <FaCog className="settings-icon" />
     <FaSignOutAlt className="logout-icon" onClick={logoutClickHandler}/>
   </div>
 </div>
