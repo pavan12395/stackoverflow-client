@@ -1,34 +1,47 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector,useDispatch } from 'react-redux';
 import { useRef } from 'react';
-import {loginHandler, statusCodeCheck, store} from '../Utils/Utils';
-import {setAccessToken,setLoginError, setRecievedRewardMessage, setRefreshToken} from '../redux/actions';
+import {loginHandler, statusCodeCheck} from '../Utils/Utils';
+import {setAccessToken,setLoginError,setRefreshToken} from '../redux/actions';
 import Modal from '../components/Modal';
+/* state specific to this page 
+loginError
+*/
 function Login() {
   const usernameRef = useRef();
   const passwordRef = useRef();
   const loginError = useSelector(state=>state.loginError);
-  console.log(loginError);
   const grpcClient = useSelector(state=>state.grpcClient);
   const dispatch = useDispatch();
+  useEffect(()=>
+  {
+    return ()=>
+    {
+       dispatch(setLoginError(""));
+    }
+  },[]);
   const loginClickHandler = async (e)=>
   {
       e.preventDefault();
-      let response = await loginHandler(grpcClient,usernameRef.current.value,passwordRef.current.value);
-      console.log(response);
-      let errorMessage = statusCodeCheck(response);
-      console.log(errorMessage);
-      if(errorMessage!=null)
+      try
       {
-         dispatch(setLoginError(errorMessage));
+        let response = await loginHandler(grpcClient,usernameRef.current.value,passwordRef.current.value);
+        let errorMessage = statusCodeCheck(response);
+        if(errorMessage!=null)
+        {
+          dispatch(setLoginError(errorMessage));
+        }
+        else
+        {
+          dispatch(setAccessToken(response.accesstoken));
+          dispatch(setRefreshToken(response.refreshtoken));
+        }
       }
-      else
+      catch(e)
       {
-        dispatch(setAccessToken(response.accesstoken));
-        dispatch(setRefreshToken(response.refreshtoken));
+        dispatch(setLoginError(e));
       }
-      
   }
   return (
     <div className="login-container">

@@ -26,10 +26,11 @@ function Signup() {
       dispatch(setSkills([]));
       dispatch(setAvailableSkillOptions(initSkills));
     }
-  },[dispatch]);
+  },[]);
   const handleButtonClick = async (e)=>
   {
         e.preventDefault();
+        try{
         const response = await signUpHandler(grpcClient,userNameRef.current.value,passwordRef.current.value,descRef.current.value,skills);
         let errorMessage = statusCodeCheck(response)
         if(errorMessage!=null)
@@ -41,6 +42,10 @@ function Signup() {
            dispatch(setAccessToken(response.accesstoken));
            dispatch(setRefreshToken(response.refreshtoken));
            navigate("/home");
+        }}
+        catch(e)
+        {
+          dispatch(setSignupError(e));
         }
   }
   

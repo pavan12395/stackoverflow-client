@@ -14,7 +14,15 @@ const Skills = () => {
   const newSkill = useSelector((state)=>state.newSkillName)
   const newDifficulty = useSelector((state)=>state.newSkillDifficulty);
   const availableSkillOptions = useSelector((state)=>state.availableSkillOptions);
-
+  useEffect(()=>
+  {
+    return ()=>
+    {
+       dispatch(setSkills([]));
+       dispatch(setNewSkillName(''));
+       dispatch(setNewSkillDifficulty(''));
+    }
+  },[]);  
   useEffect(() => {
     const selectedSkills = skills.map((skill) => skill.name);
     const updatedOptions = availableSkillOptions.filter(
@@ -33,15 +41,6 @@ const Skills = () => {
     }
   };
 
-  useEffect(()=>
-  {
-    return ()=>
-    {
-       dispatch(setSkills([]));
-       dispatch(setNewSkillName(''));
-       dispatch(setNewSkillDifficulty(''));
-    }
-  },[dispatch]);  
 
   return (
     <div className="skills-container">
