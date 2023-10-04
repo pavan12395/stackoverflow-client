@@ -50,7 +50,6 @@ export async function signUpHandler(client,username,password,description,skills)
             }
         });
     });
-    console.log(response)
     return response
 }
 

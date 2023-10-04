@@ -5,6 +5,9 @@ import { difficultyOptions,} from '../Constants/constants';
 import { setAvailableSkillOptions } from '../redux/actions';
 import { setNewSkillName } from '../redux/actions';
 import { setNewSkillDifficulty } from '../redux/actions';
+/*
+State specific to present 
+*/
 const Skills = () => {
   const skills = useSelector((state)=>(state.skills));
   const dispatch = useDispatch();
@@ -13,7 +16,6 @@ const Skills = () => {
   const availableSkillOptions = useSelector((state)=>state.availableSkillOptions);
 
   useEffect(() => {
-    // Update availableSkillOptions when skills change
     const selectedSkills = skills.map((skill) => skill.name);
     const updatedOptions = availableSkillOptions.filter(
       (option) => !selectedSkills.includes(option)
@@ -33,14 +35,12 @@ const Skills = () => {
 
   useEffect(()=>
   {
-
-    const handleBeforeUnload = ()=>
+    return ()=>
     {
        dispatch(setSkills([]));
        dispatch(setNewSkillName(''));
        dispatch(setNewSkillDifficulty(''));
     }
-    return handleBeforeUnload;
   },[dispatch]);  
 
   return (

@@ -27,7 +27,7 @@ import {
     SET_ANSWER_SOCKET
   } from './actionTypes';
 
-  import { Skills } from '../Constants/constants';
+  import { initSkills } from '../Constants/constants';
   
   const initialState = {
     user: null,
@@ -39,7 +39,7 @@ import {
     skills: [],
     newSkillName : "",
     newSkillDifficulty : "",
-    availableSkillOptions : Skills,
+    availableSkillOptions : initSkills,
     grpcClient : null,
     questionTitle : "",
     questionDescription : "",

@@ -1,12 +1,13 @@
 import React,{useEffect, useRef} from 'react';
 import { Link,useNavigate} from 'react-router-dom';
 import Skills from '../components/Skills';
-import { setSignupError,setAccessToken,setRefreshToken} from '../redux/actions';
+import { setSignupError,setAccessToken,setRefreshToken,setSkills,setAvailableSkillOptions} from '../redux/actions';
 import { useSelector,useDispatch} from 'react-redux';
 import {signUpHandler,statusCodeCheck} from '../Utils/Utils';
 import Modal from '../components/Modal';
+import { initSkills } from '../Constants/constants';
 /*
-when leaving this component we have to setSignUpError to null
+state specific to this page --> skills,setSignUpError
 */
 function Signup() {
   const userNameRef = useRef();
@@ -17,34 +18,32 @@ function Signup() {
   const grpcClient = useSelector((state)=>state.grpcClient);
   const skills = useSelector((state)=>state.skills);
   const signUpError = useSelector((state)=>state.signUpError);
-  console.log(signUpError);
-  const handleButtonClick = async (e)=>
-  {
-    console.log("Clicked!");
-        e.preventDefault();
-        const response = await signUpHandler(grpcClient,userNameRef.current.value,passwordRef.current.value,descRef.current.value,skills);
-        console.log(response);
-        let errorMessage = statusCodeCheck(response)
-        if(errorMessage!=null)
-        {
-          console.log(errorMessage);
-          dispatch(setSignupError(errorMessage));
-        }
-        else
-        {
-           console.log(response)
-           dispatch(setAccessToken(response.accesstoken));
-           dispatch(setRefreshToken(response.refreshtoken));
-           navigate("/home");
-        }
-  }
   useEffect(()=>
   {
     return ()=>
     {
       dispatch(setSignupError(""));
+      dispatch(setSkills([]));
+      dispatch(setAvailableSkillOptions(initSkills));
     }
-  },[]);
+  },[dispatch]);
+  const handleButtonClick = async (e)=>
+  {
+        e.preventDefault();
+        const response = await signUpHandler(grpcClient,userNameRef.current.value,passwordRef.current.value,descRef.current.value,skills);
+        let errorMessage = statusCodeCheck(response)
+        if(errorMessage!=null)
+        {
+          dispatch(setSignupError(errorMessage));
+        }
+        else
+        {
+           dispatch(setAccessToken(response.accesstoken));
+           dispatch(setRefreshToken(response.refreshtoken));
+           navigate("/home");
+        }
+  }
+  
   return (
     <>
     <div className="signup-container">
