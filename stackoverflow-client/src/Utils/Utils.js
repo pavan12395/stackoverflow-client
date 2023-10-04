@@ -187,7 +187,7 @@ export async function changeUserStatusHandler(client,accessToken,refreshToken,us
     request.setRequestheaders(requestHeaders);
     request.setStatus(userStatus);
     request.setWebrtcsecret(JSON.stringify(secret));
-    request.setQuestiondetails(questionDetails);
+    request.setQuestiondetails(JSON.stringify(questionDetails));
     console.log(request);
     let response = await new Promise((resolve,reject)=>
     {

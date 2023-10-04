@@ -8,15 +8,20 @@ import Chat from './pages/Chat';
 import Home from './pages/Home';
 import Layout from './components/LayOut';
 import { useSelector,useDispatch} from 'react-redux';
-import {checkTokenHandler, getGrpcClient,statusCodeCheck,getTokenHandler} from './Utils/Utils';
+import {changeUserStatusHandler, checkTokenHandler, getGrpcClient,statusCodeCheck} from './Utils/Utils';
 import {setGrpcClient,setUser,setAccessToken,setRefreshToken} from './redux/actions';
 import { useNavigate } from 'react-router-dom';
+import { FaIgloo } from 'react-icons/fa';
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const accessToken = useSelector((state)=>state.accessToken);
   const refreshToken = useSelector((state)=>state.refreshToken);
   const grpcClient = useSelector((state)=>state.grpcClient);
+  const userStatus = useSelector(state=>state.userStatus);
+  const questionDetails = useSelector(state=>state.questionDetails);
+  const userType = useSelector(state=>state.userType);
+  const webRTCConnection = useSelector(state=>state.webRTCConnection);
   useEffect(()=>
   {
       dispatch(setAccessToken(window.localStorage.getItem("accessToken")));
@@ -25,6 +30,14 @@ function App() {
       console.log(client);
       dispatch(setGrpcClient(client));
   },[]);
+  useEffect(()=>
+  {
+    if(grpcClient)
+    {
+      console.log("Changing the user status",userStatus,questionDetails);
+      changeUserStatusHandler(grpcClient,accessToken,refreshToken,userStatus.status,userStatus.id,questionDetails);
+    }
+  },[grpcClient,userStatus,questionDetails,accessToken,refreshToken]);
   useEffect(()=>
   {
     const beforeUnload = ()=>

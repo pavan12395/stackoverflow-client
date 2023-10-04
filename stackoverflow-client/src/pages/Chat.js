@@ -2,7 +2,7 @@
 import React, { useEffect,useRef} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Protect from '../components/Protect';
-import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRecievedRewardMessage,setRecievedRewardRating,setRemoteClientName, setTypeOfUser} from '../redux/actions';
+import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRecievedRewardMessage,setRecievedRewardRating,setRemoteClientName, setTypeOfUser, setUserStatus} from '../redux/actions';
 import { changeUserStatusHandler, statusCodeCheck,updateRatingHandler} from '../Utils/Utils';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Modal from '../components/Modal';
@@ -11,30 +11,29 @@ import QuestionDetails from '../components/QuestionDetails';
 function Chat() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const messageRef = useRef();
+  const webRTCConnection = useSelector(state=>state.webRTCConnection);
   const messages = useSelector((state) => state.messages);
   const user = useSelector(state=>state.user);
   const peerConnection = useSelector((state) => state.peerConnection);
   const grpcClient = useSelector((state)=>state.grpcClient);
   const questionDetails = useSelector((state)=>state.questionDetails);
-  const messageRef = useRef();
   const firstRemoteMessage = useSelector((state)=>state.firstRemoteMessage);
   const remoteClientName = useSelector((state)=>state.remoteClientName);
   const recievedRewardRating = useSelector(state=>state.recievedRewardRating);
   const userType = useSelector(state=>state.userType);
   const accessToken = useSelector(state=>state.accessToken);
   const refreshToken = useSelector(state=>state.refreshToken);
-  console.log("User type : "+userType);
-  console.log("Remote client : "+remoteClientName);
-  console.log("Question Details : ",questionDetails);
-  console.log(firstRemoteMessage);
-  console.log(peerConnection);
-  useEffect(() => {
-    const destroyState = async ()=>
+  useEffect(()=>
+  {
+    return ()=>
     {
-        console.log("Calling Destroy State");
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
+        changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
         dispatch(setMessages([]));
-        peerConnection.close();
+        if(peerConnection)
+        {
+          peerConnection.close();
+        }
         dispatch(setPeerConnection(null));
         dispatch(setMessages([]));
         dispatch(setQuestiondetails(null));
@@ -42,6 +41,12 @@ function Chat() {
         dispatch(setRemoteClientName(null));
         dispatch(setTypeOfUser(""));
         dispatch(setRecievedRewardRating(0));
+    }
+  },[]);
+  useEffect(() => {
+    const openEventListener = async ()=>
+    {
+       dispatch(setUserStatus({status : USER_STATUS.CALL,id:""}));
     }
     const closeEventListener = async (data)=>
     {
@@ -54,9 +59,7 @@ function Chat() {
           else
           {
               const response = await updateRatingHandler(grpcClient,recievedRewardRating,accessToken,refreshToken);
-              console.log(response);
               let errorMessage = statusCodeCheck(response);
-              console.log(errorMessage);
               if(errorMessage)
               {
                 dispatch(setRecievedRewardMessage("Error in Updating Rating"));
@@ -67,8 +70,10 @@ function Chat() {
               }
           }
       }
-      await destroyState();
-      navigate("/home");
+      if(webRTCConnection)
+      {
+        webRTCConnection.destroy();
+      }
     }
     const dataEventListener = (data) => {
       if(firstRemoteMessage)
@@ -76,7 +81,6 @@ function Chat() {
           if(userType=="ANSWERER")
           {
              data = JSON.parse(data);
-             console.log("FirstRemoteMessage  ANSWERER  : ",data);
              dispatch(setRemoteClientName(data.name));
              dispatch(setQuestiondetails(data.questionDetails));
              const answererFirstSendMessage = {name : user.username};
@@ -86,14 +90,12 @@ function Chat() {
           else
           {
              data = JSON.parse(data);
-             console.log("FirstRemoteMessage QUESTIONER : ",data);
              dispatch(setRemoteClientName(data.name));
           }
           dispatch(setFirstRemoteMessage(false));
       } 
       else
       {
-       console.log("Recieved Data : ",data);
        data = JSON.parse(data);
        if(data.type=="message")
        {
@@ -103,28 +105,21 @@ function Chat() {
        }
        else if(data.type=="reward")
        {
-         console.log("Recieved a Reward type");
          const rewardRating = data.rating;
-         console.log("Recieved rewardRating of  : ",rewardRating);
          dispatch(setRecievedRewardRating(rewardRating));
        }
       }
      }
     if (peerConnection) {
+      peerConnection.on("open",openEventListener);
       peerConnection.on('data',dataEventListener);
       peerConnection.on("close",closeEventListener);
     }
-    const unloadEventListener = async (e)=>
-    {
-        e.returnValue = "Exit Chat ? ";
-        await destroyState();
-    }
-    window.addEventListener("beforeunload",unloadEventListener);
     return ()=>
     {
-        window.removeEventListener("beforeunload",unloadEventListener);
         if(peerConnection)
         {
+          peerConnection.off("open",openEventListener);
           peerConnection.off("data",dataEventListener);
           peerConnection.off("close",closeEventListener);
         }
@@ -135,7 +130,6 @@ function Chat() {
       if (userType === "QUESTIONER" && firstRemoteMessage) {
         let questionerFirstSendMessage = { name: user.username, questionDetails: questionDetails };
         peerConnection.send(JSON.stringify(questionerFirstSendMessage));
-        console.log("Sent by Questioner!");
       }
     }, 1000); // 20 seconds in milliseconds
   
@@ -146,7 +140,6 @@ function Chat() {
     if (peerConnection) {
       const newMessage = { text: messageRef.current.value, sender: 'you',type:"message"};
       peerConnection.send(JSON.stringify(newMessage)); 
-      // Send the message to the remote peer
       dispatch(setMessages([...messages,newMessage]));
       messageRef.current.value="";
     }
@@ -168,7 +161,6 @@ function Chat() {
   {
     return <Protect/>
   }
-
   return (
     <>
     <QuestionDetails/>

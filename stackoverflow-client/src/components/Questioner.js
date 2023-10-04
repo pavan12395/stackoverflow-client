@@ -2,20 +2,13 @@
 import React from 'react';
 import { useSelector,useDispatch } from 'react-redux';
 import { setPeerConnection,setTypeOfUser} from '../redux/actions';
-import { useNavigate } from 'react-router-dom';
 
 function Questioner({ id, name, rating, secret,questionDetails}) {
-  const dispatch = useDispatch();  
-  const webRTCConnection = useSelector(state=>state.webRTCConnection);  
-  const grpcClient = useSelector(state=>state.grpcClient);
-  const navigate = useNavigate();
+  const webRTCConnection = useSelector(state=>state.webRTCConnection);
   const buttonClickHandler = async (e)=>
   {
     e.preventDefault();
-    const peerConnection = webRTCConnection.connect(secret);
-    dispatch(setPeerConnection(peerConnection));
-    dispatch(setTypeOfUser("ANSWERER"));
-    navigate("/chat");
+    webRTCConnection.connect(secret);
   } 
   return (
     <div className="questioner-container">

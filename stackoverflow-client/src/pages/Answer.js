@@ -3,11 +3,12 @@ import { useSelector,useDispatch} from 'react-redux';
 import Protect from '../components/Protect';
 import Questioner from '../components/Questioner';
 import Modal from '../components/Modal';
-import { setAnswerError, setAnswerSocket, setQuestioners,setWebRTCConnection } from '../redux/actions';
-import {changeUserStatusHandler, getUsersData} from '../Utils/Utils';
+import { setAnswerError, setAnswerSocket, setQuestioners,setPeerConnection,setUserStatus, setWebRTCConnection,setTypeOfUser} from '../redux/actions';
+import {getUsersData} from '../Utils/Utils';
 import io from 'socket.io-client';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
+import { useNavigate } from 'react-router-dom';
 export default function Answer()
 {    
     const dispatch = useDispatch();
@@ -15,10 +16,9 @@ export default function Answer()
     const questioners = useSelector(state=>state.questioners);
     const grpcClient = useSelector(state=>state.grpcClient);
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
-    const accessToken = useSelector(state=>state.accessToken);
-    const refreshToken = useSelector(state=>state.refreshToken);
     const answerError = useSelector(state=>state.answerError);
     const answerSocket = useSelector(state=>state.answerSocket);
+    const navigate = useNavigate();
     const modalCloseHandler = (e)=>
     {
         e.preventDefault();
@@ -26,13 +26,8 @@ export default function Answer()
     }
     useEffect(()=>
     {
-        const newPeer = new Peer();
-        dispatch(setWebRTCConnection(newPeer));
-        changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ANSWER,"","");
-    },[dispatch,grpcClient,accessToken,refreshToken]);
-    useEffect(()=>
-    {
         const socket = io('http://localhost:4000', { transports : ['websocket'] });
+        dispatch(setWebRTCConnection(new Peer()));
         dispatch(setAnswerSocket(socket));
         return ()=>
         {
@@ -73,16 +68,24 @@ export default function Answer()
     
     useEffect(()=>
     {
-        const connectionHandler = async ()=>
+        const connectionOpenHandler = async (id)=>
         {
-            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
+            dispatch(setUserStatus({status : USER_STATUS.ANSWER,id: id}));
         }
-        const closeHandler = async ()=>
+        const connectionHandler = async (connection)=>
         {
-            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
+             dispatch(setPeerConnection(connection));
+             dispatch(setTypeOfUser("ANSWERER"));
+             navigate("/chat");
+        }
+        const closeHandler =  async ()=>
+        {
+            dispatch(setUserStatus(USER_STATUS.ACTIVE));
+            navigate("/home");
         }
         if(webRTCConnection)
         {
+            webRTCConnection.on("open",connectionOpenHandler);
             webRTCConnection.on("connection",connectionHandler);
             webRTCConnection.on("close",closeHandler);
         }
@@ -90,16 +93,16 @@ export default function Answer()
         {
             if(webRTCConnection)
             {
+                webRTCConnection.off("open",connectionOpenHandler);
                 webRTCConnection.off("connection",connectionHandler);
                 webRTCConnection.off("close",closeHandler);
             }
         }
-    },[webRTCConnection,grpcClient,dispatch,accessToken,refreshToken]);
+    },[webRTCConnection,dispatch]);
     if(!user)
     {
         return <Protect/>
     }
-    console.log(questioners);
     return(
         <div>
       {questioners.map((questioner) => (

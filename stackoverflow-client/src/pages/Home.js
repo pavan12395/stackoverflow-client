@@ -18,11 +18,7 @@ export default function Home()
   useEffect(()=>
   {
     if(user){
-      const activateUserStatus = async ()=>
-      {
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
-      }
-      activateUserStatus();
+        changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
     }
   },[grpcClient,user]);
   const modalClose = (e)=>

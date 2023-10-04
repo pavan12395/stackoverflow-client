@@ -1,10 +1,10 @@
 import React, { useEffect,useRef} from 'react';
 import {useSelector,useDispatch} from 'react-redux';
 import Protect from '../components/Protect';
-import {setQuestionModal, setPeerConnection, setQuestiondetails, setTypeOfUser} from '../redux/actions';
+import {setQuestionModal, setPeerConnection, setQuestiondetails, setTypeOfUser, setUserStatus} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
-import { changeUserStatusHandler, validateQuestionDetails } from '../Utils/Utils';
+import {validateQuestionDetails } from '../Utils/Utils';
 import {setWebRTCConnection} from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -18,8 +18,6 @@ export default function Question()
     const questionRatingRewardRef = useRef();
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
     const questionModal = useSelector(state=>state.questionModal);
-    const accessToken = useSelector(state=>state.accessToken);
-    const refreshToken = useSelector(state=>state.refreshToken);
     const dispatch = useDispatch();
     useEffect(()=>
     {
@@ -34,8 +32,7 @@ export default function Question()
       const validationError = validateQuestionDetails(questionTitleRef.current.value,questionDescriptionRef.current.value,questionRatingRewardRef.current.value);
       if(!validationError || validationError.length==0)
       {
-        const newPeer = new Peer();
-        dispatch(setWebRTCConnection(newPeer));
+        dispatch(setWebRTCConnection(new Peer()));
       }
       else
       {
@@ -63,7 +60,7 @@ export default function Question()
           {
           }
           dispatch(setWebRTCConnection(null));
-          changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
+          dispatch(setUserStatus(USER_STATUS.ACTIVE));
           dispatch(setQuestionModal(null));
        }
        
@@ -78,32 +75,32 @@ export default function Question()
           };
           const connectionOpenHandler = async (id)=>
           {
-            const questionDetails = {title : questionTitleRef.current.value,description:questionDescriptionRef.current.value,rewardRating:questionRatingRewardRef.current.value};
-            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id,JSON.stringify(questionDetails));
+            dispatch(setUserStatus({status : USER_STATUS.QUESTION,id : id}));
+            const questionDetails = {title : questionTitleRef.current.value,description:questionDescriptionRef.current.value,rewardRating:parseFloat(questionRatingRewardRef.current.value)};
             dispatch(setQuestiondetails(questionDetails));
             dispatch(setQuestionModal({type:"CONNECTION",message:"Connecting to a Client",display:true}));
           }
-          const connectionCloseHandler = async ()=>
+          const closeHandler =  async ()=>
           {
-            dispatch(setWebRTCConnection(null));
-            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
+            dispatch(setUserStatus(USER_STATUS.ACTIVE));
+            navigate("/home");
           }
        if(webRTCConnection)
        {          
           webRTCConnection.on("open",connectionOpenHandler);
           webRTCConnection.on("connection",connectionHandler);
-          webRTCConnection.on("close",connectionCloseHandler)
+          webRTCConnection.on("close",closeHandler);
        }
        return ()=>
        {
           if(webRTCConnection)
           {
             webRTCConnection.off("open",connectionOpenHandler);
-            webRTCConnection.off("close",connectionCloseHandler);
             webRTCConnection.off("connection",connectionHandler);
+            webRTCConnection.off("close",closeHandler);
           }
        }
-    },[webRTCConnection,dispatch,grpcClient,accessToken,refreshToken]);
+    },[webRTCConnection,dispatch]);
     if(!user)
     {
         return <Protect/>

@@ -21,10 +21,13 @@ import {
     SET_RECIEVED_REWARD_MESSAGE,
     SET_ACCESS_TOKEN,
     SET_REFRESH_TOKEN,
-    SET_ANSWER_SOCKET
+    SET_ANSWER_SOCKET,
+    SET_USER_STATUS
   } from './actionTypes';
 
   import { initSkills } from '../Constants/constants';
+
+  import {USER_STATUS} from '../proto/stackoverflow_pb';
   
   const initialState = {
     user: null,
@@ -49,7 +52,8 @@ import {
     recievedRewardMessage : "",
     accessToken : null,
     refreshToken : null,
-    answerSocket: null
+    answerSocket: null,
+    userStatus : {status : USER_STATUS.INACTIVE,id : ""}
   };
   
   const reducer = (state = initialState, action) => {
@@ -159,6 +163,10 @@ import {
       case SET_ANSWER_SOCKET:
         return{
           ...state,answerSocket:action.payload
+        }
+      case SET_USER_STATUS:
+        return{
+          ...state,userStatus:action.payload
         }
       default:
         return state;
