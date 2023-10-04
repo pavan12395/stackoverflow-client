@@ -12,6 +12,7 @@ import {changeUserStatusHandler, checkTokenHandler, getGrpcClient,statusCodeChec
 import {setGrpcClient,setUser,setAccessToken,setRefreshToken, setUserStatus} from './redux/actions';
 import { useNavigate } from 'react-router-dom';
 import {USER_STATUS} from './proto/stackoverflow_pb';
+import { ACCESS_TOKEN, ANSWER_ROUTE, CHAT_ROUTE, EMPTY_STRING, HOME_ROUTE, LOGIN_ROUTE, QUESTION_ROUTE, REFRESH_TOKEN, SIGNUP_ROUTE } from './Constants/constants';
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,8 +24,8 @@ function App() {
   const questionDetails = useSelector(state=>state.questionDetails);
   useEffect(()=>
   {
-      dispatch(setAccessToken(window.localStorage.getItem("accessToken")));
-      dispatch(setRefreshToken(window.localStorage.getItem("refreshToken")));
+      dispatch(setAccessToken(window.localStorage.getItem(ACCESS_TOKEN)));
+      dispatch(setRefreshToken(window.localStorage.getItem(REFRESH_TOKEN)));
       const client = getGrpcClient();
       dispatch(setGrpcClient(client));
   },[]);
@@ -37,8 +38,8 @@ function App() {
   },[grpcClient,userStatus,questionDetails,accessToken,refreshToken]);
   useEffect(()=>
   {
-     window.localStorage.setItem("accessToken",accessToken);
-     window.localStorage.setItem("refreshToken",refreshToken);
+     window.localStorage.setItem(ACCESS_TOKEN,accessToken);
+     window.localStorage.setItem(REFRESH_TOKEN,refreshToken);
   },[accessToken,refreshToken]);
   useEffect(()=>
   {
@@ -50,8 +51,8 @@ function App() {
           let errorMessage = statusCodeCheck(response)
           if(errorMessage==null){
             dispatch(setUser(response.user));
-            dispatch(setUserStatus({status:USER_STATUS.ACTIVE,id:""}));
-            navigate("/home");
+            dispatch(setUserStatus({status:USER_STATUS.ACTIVE,id:EMPTY_STRING}));
+            navigate(HOME_ROUTE);
           }
       }
     }
@@ -65,12 +66,12 @@ function App() {
     <>
     <Layout/>
         <Routes>
-          <Route exact path="/" element={<Signup/>} />
-          <Route exact path="/login" element={<Login/>} />
-          <Route exact path="/question" element={<Question/>} />
-          <Route exact path="/answer" element={<Answer/>} />
-          <Route exact path="/chat" element={<Chat/>} />
-          <Route exact path="/home" element={<Home/>} />
+          <Route exact path={SIGNUP_ROUTE} element={<Signup/>} />
+          <Route exact path={LOGIN_ROUTE} element={<Login/>} />
+          <Route exact path={QUESTION_ROUTE} element={<Question/>} />
+          <Route exact path={ANSWER_ROUTE} element={<Answer/>} />
+          <Route exact path={CHAT_ROUTE} element={<Chat/>} />
+          <Route exact path={HOME_ROUTE} element={<Home/>} />
         </Routes>
     </>
   );

@@ -5,7 +5,7 @@ import { setSignupError,setAccessToken,setRefreshToken,setSkills,setAvailableSki
 import { useSelector,useDispatch} from 'react-redux';
 import {signUpHandler,statusCodeCheck} from '../Utils/Utils';
 import Modal from '../components/Modal';
-import { initSkills } from '../Constants/constants';
+import { EMPTY_STRING, HOME_ROUTE, initSkills, LOGIN_ROUTE } from '../Constants/constants';
 /*
 state specific to this page --> skills,setSignUpError
 */
@@ -41,7 +41,7 @@ function Signup() {
         {
            dispatch(setAccessToken(response.accesstoken));
            dispatch(setRefreshToken(response.refreshtoken));
-           navigate("/home");
+           navigate(HOME_ROUTE);
         }}
         catch(e)
         {
@@ -73,10 +73,10 @@ function Signup() {
           <button type="submit" onClick={handleButtonClick}>Signup</button>
         </div>
         <div className="form-group">
-          <p>Already a user? <Link to="/login">Login</Link></p>
+          <p>Already a user? <Link to={LOGIN_ROUTE}>Login</Link></p>
         </div>
       </form>
-      <Modal isOpen={signUpError!=null && signUpError !== ''} message={signUpError} onClose={() => dispatch(setSignupError(''))} displayClose={true}/>
+      <Modal isOpen={signUpError!=null && signUpError !== EMPTY_STRING} message={signUpError} onClose={() => dispatch(setSignupError(EMPTY_STRING))} displayClose={true}/>
     </div>
     </>
   );

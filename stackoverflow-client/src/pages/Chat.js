@@ -8,6 +8,7 @@ import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
 import QuestionDetails from '../components/QuestionDetails';
+import { ANSWERER, ANSWERER_NO_REWARD_MESSAGE, ANSWERER_REWARD_MESSAGE, EMPTY_STRING, ERROR_RATING_MESSAGE, HOME_ROUTE, QUESTIONER, WEB_RTC_CONNECTION_CLOSE_EVENT, WEB_RTC_CONNECTION_DATA_EVENT, WEB_RTC_CONNECTION_OPEN_EVENT, WEB_RTC_MESSAGE_TYPE, WEB_RTC_REWARD_TYPE, WEB_RTC_SENDER_LOCAL_TYPE, WEB_RTC_SENDER_REMOTE_TYPE } from '../Constants/constants';
 function Chat() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -49,11 +50,11 @@ function Chat() {
     }
     const closeEventListener = async (data)=>
     {
-      if(userType=="ANSWERER")
+      if(userType==ANSWERER)
       {
           if(recievedRewardRating==0)
           {
-            dispatch(setRecievedRewardMessage("Questioner is not Satisified with your assistance"));
+            dispatch(setRecievedRewardMessage(ANSWERER_NO_REWARD_MESSAGE));
           }
           else
           {
@@ -61,17 +62,17 @@ function Chat() {
               let errorMessage = statusCodeCheck(response);
               if(errorMessage)
               {
-                dispatch(setRecievedRewardMessage("Error in Updating Rating"));
+                dispatch(setRecievedRewardMessage(ERROR_RATING_MESSAGE));
               }
               else
               {
-                dispatch(setRecievedRewardMessage("User rewarded with rating : "+recievedRewardRating));
+                dispatch(setRecievedRewardMessage(ANSWERER_REWARD_MESSAGE+recievedRewardRating));
               }
           }
           
       }
-      dispatch(setUserStatus({status : USER_STATUS.ACTIVE,id:""}));
-      navigate("/home");
+      dispatch(setUserStatus({status : USER_STATUS.ACTIVE,id:EMPTY_STRING}));
+      navigate(HOME_ROUTE);
       if(webRTCConnection)
       {
         webRTCConnection.destroy();
@@ -80,7 +81,7 @@ function Chat() {
     const dataEventListener = (data) => {
       if(firstRemoteMessage)
       {
-          if(userType=="ANSWERER")
+          if(userType==ANSWERER)
           {
              data = JSON.parse(data);
              dispatch(setRemoteClientName(data.name));
@@ -98,13 +99,13 @@ function Chat() {
       else
       {
        data = JSON.parse(data);
-       if(data.type=="message")
+       if(data.type==WEB_RTC_MESSAGE_TYPE)
        {
         const message = data.text;
-         const newMessage = { text: message, sender: 'remote' };
+         const newMessage = { text: message, sender: WEB_RTC_SENDER_REMOTE_TYPE };
          dispatch(setMessages([...messages,newMessage]));
        }
-       else if(data.type=="reward")
+       else if(data.type==WEB_RTC_REWARD_TYPE)
        {
          const rewardRating = data.rating;
          dispatch(setRecievedRewardRating(rewardRating));
@@ -112,23 +113,23 @@ function Chat() {
       }
      }
     if (peerConnection) {
-      peerConnection.on("open",openEventListener);
-      peerConnection.on('data',dataEventListener);
-      peerConnection.on("close",closeEventListener);
+      peerConnection.on(WEB_RTC_CONNECTION_OPEN_EVENT,openEventListener);
+      peerConnection.on(WEB_RTC_CONNECTION_DATA_EVENT,dataEventListener);
+      peerConnection.on(WEB_RTC_CONNECTION_CLOSE_EVENT,closeEventListener);
     }
     return ()=>
     {
         if(peerConnection)
         {
-          peerConnection.off("open",openEventListener);
-          peerConnection.off("data",dataEventListener);
-          peerConnection.off("close",closeEventListener);
+          peerConnection.off(WEB_RTC_CONNECTION_OPEN_EVENT,openEventListener);
+          peerConnection.off(WEB_RTC_CONNECTION_DATA_EVENT,dataEventListener);
+          peerConnection.off(WEB_RTC_CONNECTION_CLOSE_EVENT,closeEventListener);
         }
     }
   }, [peerConnection,dispatch,messages,firstRemoteMessage,remoteClientName,userType,dispatch,recievedRewardRating]);
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (userType === "QUESTIONER" && firstRemoteMessage) {
+      if (userType === QUESTIONER && firstRemoteMessage) {
         let questionerFirstSendMessage = { name: user.username, questionDetails: questionDetails };
         peerConnection.send(JSON.stringify(questionerFirstSendMessage));
       }
@@ -139,7 +140,7 @@ function Chat() {
   
   const handleSend = () => {
     if (peerConnection) {
-      const newMessage = { text: messageRef.current.value, sender: 'you',type:"message"};
+      const newMessage = { text: messageRef.current.value, sender: WEB_RTC_SENDER_LOCAL_TYPE,type:WEB_RTC_MESSAGE_TYPE};
       peerConnection.send(JSON.stringify(newMessage)); 
       dispatch(setMessages([...messages,newMessage]));
       messageRef.current.value="";
@@ -149,7 +150,7 @@ function Chat() {
   const rewardHandler = (e)=>
   {
     e.preventDefault();
-    const newMessage = {type:"reward",rating:questionDetails.rewardRating};
+    const newMessage = {type:WEB_RTC_REWARD_TYPE,rating:questionDetails.rewardRating};
     peerConnection.send(JSON.stringify(newMessage));
     peerConnection.close();
   }
@@ -169,7 +170,7 @@ function Chat() {
       <div className="chat-messages">
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            {msg.sender=="you" ? user.username + " "+msg.text : remoteClientName + " "+ msg.text}
+            {msg.sender==WEB_RTC_SENDER_LOCAL_TYPE ? user.username + " "+msg.text : remoteClientName + " "+ msg.text}
           </div>
         ))}
       </div>

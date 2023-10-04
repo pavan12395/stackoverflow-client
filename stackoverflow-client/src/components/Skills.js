@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import { useSelector,useDispatch} from 'react-redux';
 import { setSkills } from '../redux/actions';
-import { difficultyOptions,} from '../Constants/constants';
+import { difficultyOptions, EMPTY_STRING,} from '../Constants/constants';
 import { setAvailableSkillOptions } from '../redux/actions';
 import { setNewSkillName } from '../redux/actions';
 import { setNewSkillDifficulty } from '../redux/actions';
@@ -36,8 +36,8 @@ const Skills = () => {
     if (newSkill && newDifficulty) {
       const skill = { name: newSkill, difficulty: newDifficulty };
       dispatch(setSkills([...skills, skill]));
-      dispatch(setNewSkillName(''));
-      dispatch(setNewSkillDifficulty(''));
+      dispatch(setNewSkillName(EMPTY_STRING));
+      dispatch(setNewSkillDifficulty(EMPTY_STRING));
     }
   };
 

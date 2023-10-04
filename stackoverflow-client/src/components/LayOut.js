@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {useNavigate } from 'react-router-dom';
 import { setAccessToken,setRefreshToken,setUser, setUserStatus} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
+import { EMPTY_STRING } from '../Constants/constants';
 const LayOut = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -15,9 +16,9 @@ const LayOut = () => {
   const logoutClickHandler = async (e)=>
   {
     e.preventDefault();
-    dispatch(setUserStatus({status:USER_STATUS.INACTIVE,id:""}));
-    dispatch(setAccessToken(""));
-    dispatch(setRefreshToken(""));
+    dispatch(setUserStatus({status:USER_STATUS.INACTIVE,id:EMPTY_STRING}));
+    dispatch(setAccessToken(EMPTY_STRING));
+    dispatch(setRefreshToken(EMPTY_STRING));
     dispatch(setUser(null));
     navigate("/");  
   }

@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import {loginHandler, statusCodeCheck} from '../Utils/Utils';
 import {setAccessToken,setLoginError,setRefreshToken} from '../redux/actions';
 import Modal from '../components/Modal';
+import { EMPTY_STRING, SIGNUP_ROUTE } from '../Constants/constants';
 /* state specific to this page 
 loginError
 */
@@ -59,10 +60,10 @@ function Login() {
           <button type="submit" onClick={loginClickHandler}>Login</button>
         </div>
         <div className="form-group">
-          <p>Create a new account? <Link to="/">Signup</Link></p>
+          <p>Create a new account? <Link to={SIGNUP_ROUTE}>Signup</Link></p>
         </div>
       </form>
-      <Modal isOpen={loginError!=null && loginError!=""} message={loginError} onClose={()=>{dispatch(setLoginError(""))}} displayClose={true}/>
+      <Modal isOpen={loginError!=null && loginError!=EMPTY_STRING} message={loginError} onClose={()=>{dispatch(setLoginError(EMPTY_STRING))}} displayClose={true}/>
     </div>
   );
 }

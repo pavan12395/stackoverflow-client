@@ -3,6 +3,7 @@ import {useSelector,useDispatch} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import Protect from '../components/Protect';
+import { ANSWER_ROUTE, EMPTY_STRING, QUESTION_ROUTE } from '../Constants/constants';
 import { setRecievedRewardMessage } from '../redux/actions';
 export default function Home()
 {
@@ -13,17 +14,17 @@ export default function Home()
   const modalClose = (e)=>
   {
     e.preventDefault();
-    dispatch(setRecievedRewardMessage(""));
+    dispatch(setRecievedRewardMessage(EMPTY_STRING));
   }
   const questionClickHandler = (e)=>
   {
     e.preventDefault();
-    navigate("/question");
+    navigate(QUESTION_ROUTE);
   }
   const answerClickHandler = (e)=>
   {
     e.preventDefault();
-    navigate("/answer");
+    navigate(ANSWER_ROUTE);
   }
   if(!user)
   {

@@ -9,6 +9,7 @@ import io from 'socket.io-client';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
 import { useNavigate } from 'react-router-dom';
+import { EMPTY_STRING, TRANSPORT_WEBSOCKET, WEB_SOCKET_CONNECTION_ERROR, WEB_RTC_CONNECTION_EVENT, WEB_SOCKET_END_POINT, WEB_SOCKET_USERS_EVENT, WEB_SOCKET_WELCOME_EVENT, WEB_SOCKET_CONNECT_ERROR_EVENT, WEB_RTC_OPEN_EVENT } from '../Constants/constants';
 export default function Answer()
 {    
     const dispatch = useDispatch();
@@ -26,7 +27,7 @@ export default function Answer()
     }
     useEffect(()=>
     {
-        const socket = io('http://localhost:4000', { transports : ['websocket'] });
+        const socket = io(WEB_SOCKET_END_POINT, { transports : [TRANSPORT_WEBSOCKET] });
         dispatch(setWebRTCConnection(new Peer()));
         dispatch(setAnswerSocket(socket));
         return ()=>
@@ -37,7 +38,7 @@ export default function Answer()
             }
             dispatch(setAnswerSocket(null));
             dispatch(setQuestioners([]));
-            dispatch(setAnswerError(""));
+            dispatch(setAnswerError(EMPTY_STRING));
         }
     },[]);
     useEffect(()=>
@@ -46,7 +47,7 @@ export default function Answer()
         {
             const connectionFailedHandler = ()=>
             {
-                dispatch(setAnswerError("Cant connect to WebSockets Server"));
+                dispatch(setAnswerError(WEB_SOCKET_CONNECTION_ERROR));
             }
             const usersHandler = async (data)=>
             {
@@ -58,14 +59,14 @@ export default function Answer()
                 const userData = await getUsersData(grpcClient,data);
                 dispatch(setQuestioners(userData));
             }
-            answerSocket.on("users",usersHandler);
-            answerSocket.on("welcome",welcomeHandler);
-            answerSocket.on("connect_error",connectionFailedHandler);
+            answerSocket.on(WEB_SOCKET_USERS_EVENT,usersHandler);
+            answerSocket.on(WEB_SOCKET_WELCOME_EVENT,welcomeHandler);
+            answerSocket.on(WEB_SOCKET_CONNECT_ERROR_EVENT,connectionFailedHandler);
             return ()=>
             {
-                answerSocket.off("users",usersHandler);
-                answerSocket.off("welcome",welcomeHandler);
-                answerSocket.off("connect_error",connectionFailedHandler);
+                answerSocket.off(WEB_SOCKET_USERS_EVENT,usersHandler);
+                answerSocket.off(WEB_SOCKET_WELCOME_EVENT,welcomeHandler);
+                answerSocket.off(WEB_SOCKET_CONNECT_ERROR_EVENT,connectionFailedHandler);
             }
        }
     },[dispatch,answerSocket,grpcClient]);
@@ -78,13 +79,13 @@ export default function Answer()
         }
         if(webRTCConnection)
         {
-            webRTCConnection.on("open",connectionOpenHandler);
+            webRTCConnection.on(WEB_RTC_OPEN_EVENT,connectionOpenHandler);
         }
         return ()=>
         {
             if(webRTCConnection)
             {
-                webRTCConnection.off("open",connectionOpenHandler);
+                webRTCConnection.off(WEB_RTC_OPEN_EVENT,connectionOpenHandler);
             }
         }
     },[webRTCConnection,dispatch]);

@@ -8,11 +8,11 @@ import {validateQuestionDetails } from '../Utils/Utils';
 import {setWebRTCConnection} from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import { CONNECTION, CONNECTION_WAIT_MESSAGE, EMPTY_STRING, QUESTIONER, VALIDATION, WEB_RTC_CONNECTION_EVENT, WEB_RTC_OPEN_EVENT } from '../Constants/constants';
 export default function Question()
 {
     const navigate = useNavigate();
     const user = useSelector(state=>state.user);
-    const grpcClient = useSelector(state=>state.grpcClient);
     const questionTitleRef = useRef();
     const questionDescriptionRef = useRef();
     const questionRatingRewardRef = useRef();
@@ -36,7 +36,7 @@ export default function Question()
       }
       else
       {
-         dispatch(setQuestionModal({type:"VALIDATION",message:validationError,display:true}));
+         dispatch(setQuestionModal({type:VALIDATION,message:validationError,display:true}));
       }
     }
     const modalCloseHandler = async (e)=>
@@ -46,11 +46,11 @@ export default function Question()
        {
           return;
        }
-       else if(questionModal.type=="VALIDATION")
+       else if(questionModal.type==VALIDATION)
        {
         dispatch(setQuestionModal(null));
        }
-       else if(questionModal.type=="CONNECTION")
+       else if(questionModal.type==CONNECTION)
        {
           try
           {
@@ -70,7 +70,7 @@ export default function Question()
         const connectionHandler = async (connection)=>
           {
              dispatch(setPeerConnection(connection));
-             dispatch(setTypeOfUser("QUESTIONER"));
+             dispatch(setTypeOfUser(QUESTIONER));
              navigate("/chat");
           };
           const connectionOpenHandler = async (id)=>
@@ -78,19 +78,19 @@ export default function Question()
             dispatch(setUserStatus({status : USER_STATUS.QUESTION,id : id}));
             const questionDetails = {title : questionTitleRef.current.value,description:questionDescriptionRef.current.value,rewardRating:parseFloat(questionRatingRewardRef.current.value)};
             dispatch(setQuestiondetails(questionDetails));
-            dispatch(setQuestionModal({type:"CONNECTION",message:"Connecting to a Client",display:true}));
+            dispatch(setQuestionModal({type:CONNECTION,message:CONNECTION_WAIT_MESSAGE,display:true}));
           }
        if(webRTCConnection)
        {          
-          webRTCConnection.on("open",connectionOpenHandler);
-          webRTCConnection.on("connection",connectionHandler);
+          webRTCConnection.on(WEB_RTC_OPEN_EVENT,connectionOpenHandler);
+          webRTCConnection.on(WEB_RTC_CONNECTION_EVENT,connectionHandler);
        }
        return ()=>
        {
           if(webRTCConnection)
           {
-            webRTCConnection.off("open",connectionOpenHandler);
-            webRTCConnection.off("connection",connectionHandler);
+            webRTCConnection.off(WEB_RTC_OPEN_EVENT,connectionOpenHandler);
+            webRTCConnection.off(WEB_RTC_CONNECTION_EVENT,connectionHandler);
           }
        }
     },[webRTCConnection,dispatch]);
@@ -131,7 +131,7 @@ export default function Question()
               required
             /><br /><br />
             <button type="submit" onClick={buttonClickHandler}>Connect!</button>
-            <Modal isOpen={questionModal!=null} message={questionModal ? questionModal.message : ""} onClose={modalCloseHandler} displayClose={!questionModal ? false : questionModal.display}/>
+            <Modal isOpen={questionModal!=null} message={questionModal ? questionModal.message : EMPTY_STRING} onClose={modalCloseHandler} displayClose={!questionModal ? false : questionModal.display}/>
           </form>
         </div>
       );
