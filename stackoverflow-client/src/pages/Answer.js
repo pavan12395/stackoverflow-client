@@ -9,7 +9,7 @@ import io from 'socket.io-client';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
 import { useNavigate } from 'react-router-dom';
-import { EMPTY_STRING, TRANSPORT_WEBSOCKET, WEB_SOCKET_CONNECTION_ERROR, WEB_RTC_CONNECTION_EVENT, WEB_SOCKET_END_POINT, WEB_SOCKET_USERS_EVENT, WEB_SOCKET_WELCOME_EVENT, WEB_SOCKET_CONNECT_ERROR_EVENT, WEB_RTC_OPEN_EVENT } from '../Constants/constants';
+import { EMPTY_STRING, TRANSPORT_WEBSOCKET, WEB_SOCKET_CONNECTION_ERROR, WEB_RTC_CONNECTION_EVENT, WEB_SOCKET_END_POINT, WEB_SOCKET_USERS_EVENT, WEB_SOCKET_WELCOME_EVENT, WEB_SOCKET_CONNECT_ERROR_EVENT, WEB_RTC_OPEN_EVENT} from '../Constants/constants';
 export default function Answer()
 {    
     const dispatch = useDispatch();
@@ -19,7 +19,6 @@ export default function Answer()
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
     const answerError = useSelector(state=>state.answerError);
     const answerSocket = useSelector(state=>state.answerSocket);
-    const navigate = useNavigate();
     const modalCloseHandler = (e)=>
     {
         e.preventDefault();
@@ -75,7 +74,6 @@ export default function Answer()
     {
         const connectionOpenHandler = async (id)=>
         {
-            console.log("fired");
             dispatch(setUserStatus({status : USER_STATUS.ANSWER,id: id}));
         }
         if(webRTCConnection)

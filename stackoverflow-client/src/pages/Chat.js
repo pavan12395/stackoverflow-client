@@ -3,12 +3,12 @@ import React, { useEffect,useRef} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Protect from '../components/Protect';
 import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRecievedRewardMessage,setRecievedRewardRating,setRemoteClientName, setTypeOfUser, setUserStatus} from '../redux/actions';
-import {statusCodeCheck,updateRatingHandler} from '../Utils/Utils';
+import {checkJWTExpired, statusCodeCheck,updateRatingHandler} from '../Utils/Utils';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
 import QuestionDetails from '../components/QuestionDetails';
-import { ANSWERER, ANSWERER_NO_REWARD_MESSAGE, ANSWERER_REWARD_MESSAGE, EMPTY_STRING, ERROR_RATING_MESSAGE, HOME_ROUTE, QUESTIONER, WEB_RTC_CONNECTION_CLOSE_EVENT, WEB_RTC_CONNECTION_DATA_EVENT, WEB_RTC_CONNECTION_OPEN_EVENT, WEB_RTC_MESSAGE_TYPE, WEB_RTC_REWARD_TYPE, WEB_RTC_SENDER_LOCAL_TYPE, WEB_RTC_SENDER_REMOTE_TYPE } from '../Constants/constants';
+import { ANSWERER, ANSWERER_NO_REWARD_MESSAGE, ANSWERER_REWARD_MESSAGE, EMPTY_STRING, ERROR_RATING_MESSAGE, HOME_ROUTE, QUESTIONER, WEB_RTC_CONNECTION_CLOSE_EVENT, WEB_RTC_CONNECTION_DATA_EVENT, WEB_RTC_CONNECTION_OPEN_EVENT, WEB_RTC_MESSAGE_TYPE, WEB_RTC_REWARD_TYPE, WEB_RTC_SENDER_LOCAL_TYPE, WEB_RTC_SENDER_REMOTE_TYPE,SESSION_EXPIRED_MESSAGE} from '../Constants/constants';
 function Chat() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -50,15 +50,20 @@ function Chat() {
     }
     const closeEventListener = async (data)=>
     {
-      if(userType==ANSWERER)
+      if(userType===ANSWERER)
       {
-          if(recievedRewardRating==0)
+          if(recievedRewardRating===0)
           {
             dispatch(setRecievedRewardMessage(ANSWERER_NO_REWARD_MESSAGE));
           }
           else
           {
               const response = await updateRatingHandler(grpcClient,recievedRewardRating,accessToken,refreshToken);
+              if(checkJWTExpired(response))
+              {
+                 alert(SESSION_EXPIRED_MESSAGE);
+                 navigate("/");
+              }
               let errorMessage = statusCodeCheck(response);
               if(errorMessage)
               {
@@ -81,7 +86,7 @@ function Chat() {
     const dataEventListener = (data) => {
       if(firstRemoteMessage)
       {
-          if(userType==ANSWERER)
+          if(userType===ANSWERER)
           {
              data = JSON.parse(data);
              dispatch(setRemoteClientName(data.name));
@@ -99,13 +104,13 @@ function Chat() {
       else
       {
        data = JSON.parse(data);
-       if(data.type==WEB_RTC_MESSAGE_TYPE)
+       if(data.type===WEB_RTC_MESSAGE_TYPE)
        {
         const message = data.text;
          const newMessage = { text: message, sender: WEB_RTC_SENDER_REMOTE_TYPE };
          dispatch(setMessages([...messages,newMessage]));
        }
-       else if(data.type==WEB_RTC_REWARD_TYPE)
+       else if(data.type===WEB_RTC_REWARD_TYPE)
        {
          const rewardRating = data.rating;
          dispatch(setRecievedRewardRating(rewardRating));
@@ -170,7 +175,7 @@ function Chat() {
       <div className="chat-messages">
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            {msg.sender==WEB_RTC_SENDER_LOCAL_TYPE ? user.username + " "+msg.text : remoteClientName + " "+ msg.text}
+            {msg.sender===WEB_RTC_SENDER_LOCAL_TYPE ? user.username + " "+msg.text : remoteClientName + " "+ msg.text}
           </div>
         ))}
       </div>
@@ -184,7 +189,7 @@ function Chat() {
       </div>
       <Modal isOpen={firstRemoteMessage} message={"Loading!"} displayClose={false}/>
       <div className="button-container">
-      {userType=="QUESTIONER" && <button className='connect-button' onClick={rewardHandler}>Reward</button>}
+      {userType==="QUESTIONER" && <button className='connect-button' onClick={rewardHandler}>Reward</button>}
       <button className='connect-button' onClick={closeHandler}>Close</button>
     </div>
     </div>

@@ -8,7 +8,7 @@ import {validateQuestionDetails } from '../Utils/Utils';
 import {setWebRTCConnection} from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
-import { CHAT_ROUTE, CONNECTION, CONNECTION_WAIT_MESSAGE, EMPTY_STRING, QUESTIONER, VALIDATION, WEB_RTC_CONNECTION_EVENT, WEB_RTC_OPEN_EVENT } from '../Constants/constants';
+import { CHAT_ROUTE, CONNECTION, CONNECTION_WAIT_MESSAGE, EMPTY_STRING, QUESTIONER, VALIDATION, WEB_RTC_CONNECTION_EVENT, WEB_RTC_OPEN_EVENT,SESSION_EXPIRED_MESSAGE} from '../Constants/constants';
 export default function Question()
 {
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function Question()
     {
       e.preventDefault();
       const validationError = validateQuestionDetails(questionTitleRef.current.value,questionDescriptionRef.current.value,questionRatingRewardRef.current.value);
-      if(!validationError || validationError.length==0)
+      if(!validationError || validationError.length===0)
       {
         dispatch(setWebRTCConnection(new Peer()));
       }
@@ -39,18 +39,18 @@ export default function Question()
          dispatch(setQuestionModal({type:VALIDATION,message:validationError,display:true}));
       }
     }
-    const modalCloseHandler = async (e)=>
+    const modalCloseHandler = (e)=>
     {
        e.preventDefault();
        if(!questionModal)
        {
           return;
        }
-       else if(questionModal.type==VALIDATION)
+       else if(questionModal.type===VALIDATION)
        {
         dispatch(setQuestionModal(null));
        }
-       else if(questionModal.type==CONNECTION)
+       else if(questionModal.type===CONNECTION)
        {
           try
           {
@@ -67,13 +67,13 @@ export default function Question()
     }
     useEffect(()=>
     {
-        const connectionHandler = async (connection)=>
+        const connectionHandler = (connection)=>
           {
              dispatch(setPeerConnection(connection));
              dispatch(setTypeOfUser(QUESTIONER));
              navigate(CHAT_ROUTE);
           };
-          const connectionOpenHandler = async (id)=>
+          const connectionOpenHandler = (id)=>
           {
             dispatch(setUserStatus({status : USER_STATUS.QUESTION,id : id}));
             const questionDetails = {title : questionTitleRef.current.value,description:questionDescriptionRef.current.value,rewardRating:parseFloat(questionRatingRewardRef.current.value)};

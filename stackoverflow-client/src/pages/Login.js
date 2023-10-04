@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector,useDispatch } from 'react-redux';
 import { useRef } from 'react';
-import {loginHandler, statusCodeCheck} from '../Utils/Utils';
+import {loginHandler, statusCodeCheck,checkJWTExpired} from '../Utils/Utils';
 import {setAccessToken,setLoginError,setRefreshToken} from '../redux/actions';
 import Modal from '../components/Modal';
-import { EMPTY_STRING, SIGNUP_ROUTE } from '../Constants/constants';
+import { EMPTY_STRING, SIGNUP_ROUTE,SESSION_EXPIRED_MESSAGE } from '../Constants/constants';
+import { useNavigate } from 'react-router-dom';
 /* state specific to this page 
 loginError
 */
@@ -15,6 +16,7 @@ function Login() {
   const loginError = useSelector(state=>state.loginError);
   const grpcClient = useSelector(state=>state.grpcClient);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(()=>
   {
     return ()=>
@@ -28,6 +30,11 @@ function Login() {
       try
       {
         let response = await loginHandler(grpcClient,usernameRef.current.value,passwordRef.current.value);
+        if(checkJWTExpired(response))
+          {
+             alert(SESSION_EXPIRED_MESSAGE);
+             navigate("/");
+          }
         let errorMessage = statusCodeCheck(response);
         if(errorMessage!=null)
         {

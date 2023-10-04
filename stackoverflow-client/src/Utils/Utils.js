@@ -10,7 +10,9 @@ export function getGrpcClient()
 
 export function checkJWTExpired(response)
 {
-    const errorMessage = response.responseheaders.errormessagesList[0];
+    
+    const errorMessage = statusCodeCheck(response);
+    if(!errorMessage){return false;}
     if(errorMessage.startsWith(JWT_EXPIRED_MESSAGE))
     {
         return true;
@@ -261,15 +263,15 @@ export async function updateRatingHandler(client,reward,accessToken,refreshToken
 
 export function validateQuestionDetails(questionTitle,questionDescription,rewardRating)
 {
-    if(!questionTitle || questionTitle.length == 0)
+    if(!questionTitle || questionTitle.length === 0)
     {
         return QUESTION_TITLE_EMPTY;
     }
-    else if(!questionDescription || questionDescription.length == 0)
+    else if(!questionDescription || questionDescription.length === 0)
     {
         return QUESTION_DESC_EMPTY;
     }
-    else if(rewardRating==0.0)
+    else if(rewardRating===0.0)
     {
         return QUESTION_REWARD_EMPTY;
     }

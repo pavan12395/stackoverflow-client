@@ -8,7 +8,7 @@
 // versions:
 // 	protoc-gen-grpc-web v1.4.2
 // 	protoc              v4.24.3
-// source: stackoverflow.proto
+// source: src/proto/stackoverflow.proto
 
 
 /* eslint-disable */

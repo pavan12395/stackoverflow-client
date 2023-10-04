@@ -8,11 +8,11 @@ import Chat from './pages/Chat';
 import Home from './pages/Home';
 import Layout from './components/LayOut';
 import { useSelector,useDispatch} from 'react-redux';
-import {changeUserStatusHandler, checkTokenHandler, getGrpcClient,statusCodeCheck} from './Utils/Utils';
+import {changeUserStatusHandler, checkJWTExpired, checkTokenHandler, getGrpcClient,statusCodeCheck} from './Utils/Utils';
 import {setGrpcClient,setUser,setAccessToken,setRefreshToken, setUserStatus} from './redux/actions';
 import { useNavigate } from 'react-router-dom';
 import {USER_STATUS} from './proto/stackoverflow_pb';
-import { ACCESS_TOKEN, ANSWER_ROUTE, CHAT_ROUTE, EMPTY_STRING, HOME_ROUTE, LOGIN_ROUTE, QUESTION_ROUTE, REFRESH_TOKEN, SIGNUP_ROUTE } from './Constants/constants';
+import { ACCESS_TOKEN, ANSWER_ROUTE, CHAT_ROUTE, EMPTY_STRING, HOME_ROUTE, LOGIN_ROUTE, QUESTION_ROUTE, REFRESH_TOKEN, SIGNUP_ROUTE,SESSION_EXPIRED_MESSAGE} from './Constants/constants';
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,7 +20,6 @@ function App() {
   const refreshToken = useSelector((state)=>state.refreshToken);
   const grpcClient = useSelector((state)=>state.grpcClient);
   const userStatus = useSelector(state=>state.userStatus);
-  const user = useSelector(state=>state.user);
   const questionDetails = useSelector(state=>state.questionDetails);
   useEffect(()=>
   {
@@ -33,7 +32,15 @@ function App() {
   {
     if(grpcClient && accessToken && refreshToken)
     {
-      changeUserStatusHandler(grpcClient,accessToken,refreshToken,userStatus.status,userStatus.id,questionDetails);
+      changeUserStatusHandler(grpcClient,accessToken,refreshToken,userStatus.status,userStatus.id,questionDetails)
+      .then((response)=>
+      {
+          if(checkJWTExpired(response))
+          {
+             alert(SESSION_EXPIRED_MESSAGE);
+             navigate("/");
+          }
+      });
     }
   },[grpcClient,userStatus,questionDetails,accessToken,refreshToken]);
   useEffect(()=>
@@ -48,8 +55,13 @@ function App() {
       if(accessToken)
       {
           const response =await checkTokenHandler(grpcClient,accessToken,null);
+          if(checkJWTExpired(response))
+          {
+             alert(SESSION_EXPIRED_MESSAGE);
+             navigate("/");
+          }
           let errorMessage = statusCodeCheck(response)
-          if(errorMessage==null){
+          if(errorMessage===null){
             dispatch(setUser(response.user));
             dispatch(setUserStatus({status:USER_STATUS.ACTIVE,id:EMPTY_STRING}));
             navigate(HOME_ROUTE);

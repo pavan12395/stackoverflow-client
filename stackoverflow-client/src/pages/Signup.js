@@ -3,9 +3,9 @@ import { Link,useNavigate} from 'react-router-dom';
 import Skills from '../components/Skills';
 import { setSignupError,setAccessToken,setRefreshToken,setSkills,setAvailableSkillOptions} from '../redux/actions';
 import { useSelector,useDispatch} from 'react-redux';
-import {signUpHandler,statusCodeCheck} from '../Utils/Utils';
+import {signUpHandler,statusCodeCheck,checkJWTExpired} from '../Utils/Utils';
 import Modal from '../components/Modal';
-import { EMPTY_STRING, HOME_ROUTE, initSkills, LOGIN_ROUTE } from '../Constants/constants';
+import { EMPTY_STRING, HOME_ROUTE, initSkills, LOGIN_ROUTE,SESSION_EXPIRED_MESSAGE } from '../Constants/constants';
 /*
 state specific to this page --> skills,setSignUpError
 */
@@ -32,6 +32,11 @@ function Signup() {
         e.preventDefault();
         try{
         const response = await signUpHandler(grpcClient,userNameRef.current.value,passwordRef.current.value,descRef.current.value,skills);
+        if(checkJWTExpired(response))
+          {
+             alert(SESSION_EXPIRED_MESSAGE);
+             navigate("/");
+          }
         let errorMessage = statusCodeCheck(response)
         if(errorMessage!=null)
         {

@@ -1,4 +1,4 @@
-// source: stackoverflow.proto
+// source: src/proto/stackoverflow.proto
 /**
  * @fileoverview
  * @enhanceable
