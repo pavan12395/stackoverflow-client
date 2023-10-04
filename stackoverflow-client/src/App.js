@@ -9,9 +9,9 @@ import Home from './pages/Home';
 import Layout from './components/LayOut';
 import { useSelector,useDispatch} from 'react-redux';
 import {changeUserStatusHandler, checkTokenHandler, getGrpcClient,statusCodeCheck} from './Utils/Utils';
-import {setGrpcClient,setUser,setAccessToken,setRefreshToken} from './redux/actions';
+import {setGrpcClient,setUser,setAccessToken,setRefreshToken, setUserStatus} from './redux/actions';
 import { useNavigate } from 'react-router-dom';
-import { FaIgloo } from 'react-icons/fa';
+import {USER_STATUS} from './proto/stackoverflow_pb';
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -19,37 +19,26 @@ function App() {
   const refreshToken = useSelector((state)=>state.refreshToken);
   const grpcClient = useSelector((state)=>state.grpcClient);
   const userStatus = useSelector(state=>state.userStatus);
+  const user = useSelector(state=>state.user);
   const questionDetails = useSelector(state=>state.questionDetails);
-  const userType = useSelector(state=>state.userType);
-  const webRTCConnection = useSelector(state=>state.webRTCConnection);
   useEffect(()=>
   {
       dispatch(setAccessToken(window.localStorage.getItem("accessToken")));
       dispatch(setRefreshToken(window.localStorage.getItem("refreshToken")));
       const client = getGrpcClient();
-      console.log(client);
       dispatch(setGrpcClient(client));
   },[]);
   useEffect(()=>
   {
-    if(grpcClient)
+    if(grpcClient && accessToken && refreshToken)
     {
-      console.log("Changing the user status",userStatus,questionDetails);
       changeUserStatusHandler(grpcClient,accessToken,refreshToken,userStatus.status,userStatus.id,questionDetails);
     }
   },[grpcClient,userStatus,questionDetails,accessToken,refreshToken]);
   useEffect(()=>
   {
-    const beforeUnload = ()=>
-    {
      window.localStorage.setItem("accessToken",accessToken);
      window.localStorage.setItem("refreshToken",refreshToken);
-    }
-    window.addEventListener("beforeunload",beforeUnload);
-    return ()=>
-    {
-      window.removeEventListener("beforeunload",beforeUnload);
-    }
   },[accessToken,refreshToken]);
   useEffect(()=>
   {
@@ -61,6 +50,7 @@ function App() {
           let errorMessage = statusCodeCheck(response)
           if(errorMessage==null){
             dispatch(setUser(response.user));
+            dispatch(setUserStatus({status:USER_STATUS.ACTIVE,id:""}));
             navigate("/home");
           }
       }

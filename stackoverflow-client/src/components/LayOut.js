@@ -15,7 +15,7 @@ const LayOut = () => {
   const logoutClickHandler = async (e)=>
   {
     e.preventDefault();
-    dispatch(setUserStatus(USER_STATUS.INACTIVE));
+    dispatch(setUserStatus({status:USER_STATUS.INACTIVE,id:""}));
     dispatch(setAccessToken(""));
     dispatch(setRefreshToken(""));
     dispatch(setUser(null));

@@ -7,9 +7,6 @@ import { setRecievedRewardMessage } from '../redux/actions';
 export default function Home()
 {
   const user = useSelector(state=>state.user);
-  const grpcClient = useSelector(state=>state.grpcClient);
-  const accessToken = useSelector(state=>state.accessToken);
-  const refreshToken = useSelector(state=>state.refreshToken);
   const dispatch = useDispatch();
   const recievedRewardMessage = useSelector(state=>state.recievedRewardMessage);
   const navigate = useNavigate();

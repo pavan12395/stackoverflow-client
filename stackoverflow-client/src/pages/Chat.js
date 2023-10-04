@@ -49,7 +49,6 @@ function Chat() {
     }
     const closeEventListener = async (data)=>
     {
-      console.log("closedEventListener");
       if(userType=="ANSWERER")
       {
           if(recievedRewardRating==0)
@@ -87,7 +86,6 @@ function Chat() {
              dispatch(setRemoteClientName(data.name));
              dispatch(setQuestiondetails(data.questionDetails));
              const answererFirstSendMessage = {name : user.username};
-             console.log(answererFirstSendMessage);
              peerConnection.send(JSON.stringify(answererFirstSendMessage));
           }
           else

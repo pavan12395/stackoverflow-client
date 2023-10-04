@@ -5,7 +5,6 @@ import {SKILL_NAME,SKILL_DIFFICULTY,Skill} from '../proto/stackoverflow_pb';
 export function getGrpcClient()
 {
     const client = new StackOverflowClient("http://localhost:9090",null,null)
-    console.log(client);
     return client;
 }
 
@@ -106,7 +105,6 @@ export async function checkTokenHandler(client,accessToken,refreshToken)
 
 export async function getTokenHandler(client,refreshToken)
 {
-    console.log("Calling getToken Handler");
     let authorization = AuthorizationFunc("",refreshToken)
     let requestHeaders = RequestHeadersFunc(authorization)
     let request = new GetTokenRequest();
@@ -130,19 +128,17 @@ export async function getTokenHandler(client,refreshToken)
 
 export async function logOutHandler(client,accessToken,refreshToken)
 {
-    console.log("Calling logout handler");
     let authorization = AuthorizationFunc(accessToken,refreshToken)
     let requestHeaders = RequestHeadersFunc(authorization)
     let request = new LogoutRequest();
     request.setRequestheaders(requestHeaders);
-    console.log(client);
     let response =await new Promise((resolve,reject)=>
     {
         client.logout(request,null,(err,response)=>
         {
             if(err)
             {
-                console.log(err);
+                reject(err.message);
             }
             else
             {
@@ -179,8 +175,6 @@ export async function loginHandler(client,username,password)
 
 export async function changeUserStatusHandler(client,accessToken,refreshToken,userStatus,secret,questionDetails)
 {
-    console.log(userStatus);
-    console.log(typeof secret);
     let authorization = AuthorizationFunc(accessToken,refreshToken)
     let requestHeaders = RequestHeadersFunc(authorization)
     let request = new ChangeUserStatusRequest();
@@ -188,7 +182,6 @@ export async function changeUserStatusHandler(client,accessToken,refreshToken,us
     request.setStatus(userStatus);
     request.setWebrtcsecret(JSON.stringify(secret));
     request.setQuestiondetails(JSON.stringify(questionDetails));
-    console.log(request);
     let response = await new Promise((resolve,reject)=>
     {
         client.changeUserStatus(request,null,(err,response)=>
@@ -200,7 +193,6 @@ export async function changeUserStatusHandler(client,accessToken,refreshToken,us
             else
             {
                 response = response.toObject();
-                console.log("ChangeUSerSTatus " ,response)
                 resolve(response);
             }
         })
@@ -212,7 +204,6 @@ export async function getUserData(client,id)
 {
     let request = new GetUserDetailsByIdRequest();
     request.setUserid(id);
-    console.log(request);
     let response = await new Promise((resolve,reject)=>
     {
         client.getUserDetailsById(request,null,(err,response)=>
@@ -224,12 +215,10 @@ export async function getUserData(client,id)
             else
             {
                 response = response.toObject();
-                console.log(response);
                 resolve(response);
             }
         });
     });
-    console.log(response);
     return response;
 }
 
@@ -238,13 +227,10 @@ export async function getUsersData(client,data)
     const finalData = [];
   
   for (const user of data) {
-    console.log(user.id + " and " + user.status + " and " + user.webrtc_secret);
     const response = await getUserData(client, user.id);
     const finalUser = { id: user.id, name: response.username, rating: response.rating, secret: user.webrtc_secret,questionDetails: JSON.parse(user.question_details)};
     finalData.push(finalUser);
   }
-
-  console.log(finalData);
   return finalData;
 } 
 
@@ -253,7 +239,6 @@ export async function updateRatingHandler(client,reward,accessToken,refreshToken
     let authorization = AuthorizationFunc(accessToken,refreshToken)
     let requestHeaders = RequestHeadersFunc(authorization)
     let request =new UpdateRatingRequest();
-    console.log(request);
     request.setRequestheaders(requestHeaders);
     request.setRating(reward);
     let response = await new Promise((resolve,reject)=>
@@ -271,13 +256,11 @@ export async function updateRatingHandler(client,reward,accessToken,refreshToken
             }
         })
     });
-    console.log(response);
     return response;
 }
 
 export function validateQuestionDetails(questionTitle,questionDescription,rewardRating)
 {
-    console.log(typeof questionTitle,typeof questionDescription,typeof rewardRating);
     if(!questionTitle || questionTitle.length == 0)
     {
         return "Question title is Empty!";
