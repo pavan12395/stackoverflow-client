@@ -32,3 +32,7 @@ export const WEB_RTC_REWARD_TYPE = "reward";
 export const WEB_RTC_CONNECTION_OPEN_EVENT = "open";
 export const WEB_RTC_CONNECTION_DATA_EVENT = "data";
 export const WEB_RTC_CONNECTION_CLOSE_EVENT = "close";
+export const GRPC_SERVER_END_POINT = "http://localhost:9090";
+export const QUESTION_TITLE_EMPTY = "Question title is Empty!";
+export const QUESTION_DESC_EMPTY = "Question Description is Empty!";
+export const QUESTION_REWARD_EMPTY = "Reward Amount should be More than 0";

@@ -1,10 +1,10 @@
-import { Skills } from '../Constants/constants';
+import { GRPC_SERVER_END_POINT, QUESTION_DESC_EMPTY, QUESTION_REWARD_EMPTY, QUESTION_TITLE_EMPTY, Skills } from '../Constants/constants';
 import {StackOverflowClient} from '../proto/stackoverflow_grpc_web_pb';
 import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest,ChangeUserStatusRequest,GetUserDetailsByIdRequest,UpdateRatingRequest} from '../proto/stackoverflow_pb';
 import {SKILL_NAME,SKILL_DIFFICULTY,Skill} from '../proto/stackoverflow_pb';
 export function getGrpcClient()
 {
-    const client = new StackOverflowClient("http://localhost:9090",null,null)
+    const client = new StackOverflowClient(GRPC_SERVER_END_POINT,null,null)
     return client;
 }
 
@@ -263,14 +263,14 @@ export function validateQuestionDetails(questionTitle,questionDescription,reward
 {
     if(!questionTitle || questionTitle.length == 0)
     {
-        return "Question title is Empty!";
+        return QUESTION_TITLE_EMPTY;
     }
     else if(!questionDescription || questionDescription.length == 0)
     {
-        return "Question Description is Empty!";
+        return QUESTION_DESC_EMPTY;
     }
     else if(rewardRating==0.0)
     {
-        return "Reward Amount should be More than 0";
+        return QUESTION_REWARD_EMPTY;
     }
 }
