@@ -1,5 +1,4 @@
 import {
-    SET_AUTH_STATUS,
     SET_USER,
     SET_LOGIN_ERROR,
     SET_SIGNUP_ERROR,
@@ -22,13 +21,15 @@ import {
     SET_REMOTE_CLIENT_NAME,
     SET_TYPE_OF_USER,
     SET_RECIEVED_REWARD_RATING,
-    SET_RECIEVED_REWARD_MESSAGE
+    SET_RECIEVED_REWARD_MESSAGE,
+    SET_ACCESS_TOKEN,
+    SET_REFRESH_TOKEN,
+    SET_ANSWER_SOCKET
   } from './actionTypes';
 
   import { Skills } from '../Constants/constants';
   
   const initialState = {
-    isAuth: false,
     user: null,
     loginError: null,
     signUpError: null,
@@ -51,17 +52,14 @@ import {
     remoteClientName : null,
     userType : "",
     recievedRewardRating : 0,
-    recievedRewardMessage : ""
+    recievedRewardMessage : "",
+    accessToken : null,
+    refreshToken : null,
+    answerSocket: null
   };
   
   const reducer = (state = initialState, action) => {
     switch (action.type) {
-      case SET_AUTH_STATUS:
-        return {
-          ...state,
-          isAuth: action.payload,
-        };
-  
       case SET_USER:
         return {
           ...state,
@@ -167,6 +165,18 @@ import {
       case SET_RECIEVED_REWARD_MESSAGE:
         return{
           ...state,recievedRewardMessage:action.payload
+        }
+      case SET_ACCESS_TOKEN:
+        return{
+          ...state,accessToken:action.payload
+        }
+      case SET_REFRESH_TOKEN:
+        return{
+          ...state,refreshToken:action.payload
+        }
+      case SET_ANSWER_SOCKET:
+        return{
+          ...state,answerSocket:action.payload
         }
       default:
         return state;

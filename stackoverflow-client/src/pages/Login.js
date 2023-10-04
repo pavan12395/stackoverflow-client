@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSelector,useDispatch } from 'react-redux';
 import { useRef } from 'react';
 import {loginHandler, statusCodeCheck, store} from '../Utils/Utils';
-import {setAuthStatus, setLoginError} from '../redux/actions';
+import {setAccessToken,setLoginError, setRecievedRewardMessage, setRefreshToken} from '../redux/actions';
 import Modal from '../components/Modal';
 function Login() {
   const usernameRef = useRef();
@@ -16,6 +16,7 @@ function Login() {
   {
       e.preventDefault();
       let response = await loginHandler(grpcClient,usernameRef.current.value,passwordRef.current.value);
+      console.log(response);
       let errorMessage = statusCodeCheck(response);
       console.log(errorMessage);
       if(errorMessage!=null)
@@ -24,9 +25,8 @@ function Login() {
       }
       else
       {
-        store("accessToken",response.accesstoken);
-        store("refreshToken",response.refreshtoken);
-        dispatch(setAuthStatus(true));
+        dispatch(setAccessToken(response.accesstoken));
+        dispatch(setRefreshToken(response.refreshtoken));
       }
       
   }

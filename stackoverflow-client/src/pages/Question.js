@@ -21,6 +21,8 @@ export default function Question()
     const questionModal = useSelector(state=>state.questionModal);
     const peerConnection = useSelector(state=>state.peerConnection);
     const questionDetails = useSelector(state=>state.questionDetails);
+    const accessToken = useSelector(state=>state.accessToken);
+    const refreshToken = useSelector(state=>state.refreshToken);
     const dispatch = useDispatch();
     const destroyState = ()=>
     {
@@ -54,16 +56,12 @@ export default function Question()
         console.log(e);
        }
        dispatch(setWebRTCConnection(null));
-       let accessToken = window.localStorage.getItem("accessToken");
-       let refreshToken = window.localStorage.getItem("refreshToken");
        const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
        console.log(response);
        dispatch(setQuestionModal(""));
     }
     useEffect(()=>
     {
-      let accessToken = window.localStorage.getItem("accessToken");
-      let refreshToken = window.localStorage.getItem("refreshToken");
         const connectionHandler = async (connection)=>
           {
              console.log("Remote Client Connected!");
@@ -111,11 +109,9 @@ export default function Question()
             webRTCConnection.off("connection",connectionHandler);
           }
        }
-    },[webRTCConnection,dispatch,grpcClient,questionDetails,questionTitle,questionDescription,questionRatingReward]);
+    },[webRTCConnection,dispatch,grpcClient,questionDetails,questionTitle,questionDescription,questionRatingReward,accessToken,refreshToken]);
     useEffect(()=>
     {
-      let accessToken = window.localStorage.getItem("accessToken");
-      let refreshToken = window.localStorage.getItem("refreshToken");
       const questionCleanUp = async (e)=>
       {
         await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
@@ -131,7 +127,7 @@ export default function Question()
       {
         window.removeEventListener("beforeunload",questionCleanUp);
       }
-    },[]);
+    },[accessToken,refreshToken]);
     if(!user)
     {
         return <Protect/>

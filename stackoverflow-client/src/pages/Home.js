@@ -10,6 +10,8 @@ export default function Home()
 {
   const user = useSelector(state=>state.user);
   const grpcClient = useSelector(state=>state.grpcClient);
+  const accessToken = useSelector(state=>state.accessToken);
+  const refreshToken = useSelector(state=>state.refreshToken);
   const dispatch = useDispatch();
   const recievedRewardMessage = useSelector(state=>state.recievedRewardMessage);
   console.log(recievedRewardMessage);
@@ -22,15 +24,13 @@ export default function Home()
   useEffect(()=>
     {
       if(user){
-        const accessToken = window.localStorage.getItem("accessToken");
-        const refreshToken = window.localStorage.getItem("refreshToken");
         const activateUserStatus = async ()=>
         {
             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
         }
         activateUserStatus();
       }
-    },[grpcClient,user])
+    },[grpcClient,user,accessToken,refreshToken])
     if(!user)
     {
         return <Protect/>

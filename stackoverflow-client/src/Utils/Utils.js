@@ -128,10 +128,6 @@ export async function getTokenHandler(client,refreshToken)
     return response;
 
 }
-export function store(key,value)
-{
-    window.localStorage.setItem(key,value);
-}
 
 export async function logOutHandler(client,accessToken,refreshToken)
 {

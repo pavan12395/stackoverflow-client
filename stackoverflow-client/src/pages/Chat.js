@@ -21,14 +21,14 @@ function Chat() {
   const remoteClientName = useSelector((state)=>state.remoteClientName);
   const recievedRewardRating = useSelector(state=>state.recievedRewardRating);
   const userType = useSelector(state=>state.userType);
+  const accessToken = useSelector(state=>state.accessToken);
+  const refreshToken = useSelector(state=>state.refreshToken);
   console.log("User type : "+userType);
   console.log("Remote client : "+remoteClientName);
   console.log("Question Details : ",questionDetails);
   console.log(firstRemoteMessage);
   console.log(peerConnection);
   useEffect(() => {
-    let accessToken = window.localStorage.getItem("accessToken");
-    let refreshToken = window.localStorage.getItem("refreshToken");
     const destroyState = async ()=>
     {
         console.log("Calling Destroy State");
@@ -140,7 +140,7 @@ function Chat() {
     }, 1000); // 20 seconds in milliseconds
   
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts
-  }, [userType, firstRemoteMessage, peerConnection, user, questionDetails]);
+  }, [userType, firstRemoteMessage, peerConnection, user, questionDetails,accessToken,refreshToken]);
   
   const handleSend = () => {
     if (peerConnection) {

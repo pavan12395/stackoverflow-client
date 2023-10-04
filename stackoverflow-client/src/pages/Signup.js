@@ -1,9 +1,9 @@
 import React,{useEffect, useRef} from 'react';
 import { Link,useNavigate} from 'react-router-dom';
 import Skills from '../components/Skills';
-import { setSignupError,setAuthStatus} from '../redux/actions';
+import { setSignupError,setAccessToken,setRefreshToken} from '../redux/actions';
 import { useSelector,useDispatch} from 'react-redux';
-import {signUpHandler,statusCodeCheck,store} from '../Utils/Utils';
+import {signUpHandler,statusCodeCheck} from '../Utils/Utils';
 import Modal from '../components/Modal';
 /*
 when leaving this component we have to setSignUpError to null
@@ -33,9 +33,8 @@ function Signup() {
         else
         {
            console.log(response)
-           store("accessToken",response.accesstoken)
-           store("refreshToken",response.refreshtoken)
-           dispatch(setAuthStatus(true));
+           dispatch(setAccessToken(response.accesstoken));
+           dispatch(setRefreshToken(response.refreshtoken));
            navigate("/home");
         }
   }

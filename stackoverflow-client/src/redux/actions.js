@@ -1,5 +1,5 @@
 import {SET_ANSWER_ERROR,SET_AUTH_STATUS,SET_LOGIN_ERROR,SET_QUESTIONERS,SET_SIGNUP_ERROR,SET_SKILLS,SET_USER,SET_WEBRTC_CONNECTION,
-SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD, SET_QUESTION_MODAL, SET_PEER_CONNECTION, SET_MESSAGES, SET_QUESTION_DETAILS, SET_FIRST_REMOTE_MESSAGE, SET_REMOTE_CLIENT_NAME, SET_TYPE_OF_USER, SET_RECIEVED_REWARD_RATING, SET_RECIEVED_REWARD_MESSAGE} from './actionTypes';
+SET_NEWSKILL_DIFFICULTY,SET_NEWSKILL_NAME,SET_AVAILABLESKILLOPTIONS, SET_GRPC_CLIENT, SET_QUESTION_TITLE, SET_QUESTION_DESCRIPTION, SET_RATING_REWARD, SET_QUESTION_MODAL, SET_PEER_CONNECTION, SET_MESSAGES, SET_QUESTION_DETAILS, SET_FIRST_REMOTE_MESSAGE, SET_REMOTE_CLIENT_NAME, SET_TYPE_OF_USER, SET_RECIEVED_REWARD_RATING, SET_RECIEVED_REWARD_MESSAGE, SET_ACCESS_TOKEN, SET_REFRESH_TOKEN, SET_ANSWER_SOCKET} from './actionTypes';
 // Action creators
 export const setQuestioners = (data) => {
   return {
@@ -29,12 +29,7 @@ export const setWebRTCConnection = (connectionData) => {
   };
 };
 
-export const setAuthStatus = (status) => {
-  return {
-    type: SET_AUTH_STATUS,
-    payload: status,
-  };
-};
+
 
 export const setUser = (user) => {
   return {
@@ -181,5 +176,29 @@ export const setRecievedRewardMessage = (recievedRewardMessage)=>
   return {
     type : SET_RECIEVED_REWARD_MESSAGE,
     payload : recievedRewardMessage
+  }
+}
+
+export const setAccessToken = (accessToken)=>
+{
+  return {
+    type : SET_ACCESS_TOKEN,
+    payload: accessToken
+  }
+}
+
+export const setRefreshToken = (refreshToken)=>
+{
+  return {
+    type : SET_REFRESH_TOKEN,
+    payload : refreshToken
+  }
+}
+
+export const setAnswerSocket = (socket)=>
+{
+  return{
+    type : SET_ANSWER_SOCKET,
+    payload : socket
   }
 }
