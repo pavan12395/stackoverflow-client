@@ -2,14 +2,10 @@ import React from 'react';
 import { FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa'; // Import the icons you want to use
 import { useDispatch, useSelector } from 'react-redux';
 import {useNavigate } from 'react-router-dom';
-import { setAccessToken,setRefreshToken,setUser} from '../redux/actions';
-import { changeUserStatusHandler, logOutHandler, statusCodeCheck } from '../Utils/Utils';
+import { setAccessToken,setRefreshToken,setUser, setUserStatus} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 const LayOut = () => {
   const user = useSelector((state) => state.user);
-  const grpcClient = useSelector((state)=>state.grpcClient);
-  const accessToken = useSelector(state=>state.accessToken);
-  const refreshToken = useSelector(state=>state.refreshToken);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   if(!user)
@@ -19,7 +15,7 @@ const LayOut = () => {
   const logoutClickHandler = async (e)=>
   {
     e.preventDefault();
-    await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.INACTIVE,"",null);  
+    dispatch(setUserStatus(USER_STATUS.INACTIVE));
     dispatch(setAccessToken(""));
     dispatch(setRefreshToken(""));
     dispatch(setUser(null));

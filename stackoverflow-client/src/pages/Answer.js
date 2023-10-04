@@ -31,6 +31,10 @@ export default function Answer()
         dispatch(setAnswerSocket(socket));
         return ()=>
         {
+            if(answerSocket)
+            {
+                answerSocket.disconnect();
+            }
             dispatch(setAnswerSocket(null));
             dispatch(setQuestioners([]));
             dispatch(setAnswerError(""));
@@ -72,30 +76,15 @@ export default function Answer()
         {
             dispatch(setUserStatus({status : USER_STATUS.ANSWER,id: id}));
         }
-        const connectionHandler = async (connection)=>
-        {
-             dispatch(setPeerConnection(connection));
-             dispatch(setTypeOfUser("ANSWERER"));
-             navigate("/chat");
-        }
-        const closeHandler =  async ()=>
-        {
-            dispatch(setUserStatus(USER_STATUS.ACTIVE));
-            navigate("/home");
-        }
         if(webRTCConnection)
         {
             webRTCConnection.on("open",connectionOpenHandler);
-            webRTCConnection.on("connection",connectionHandler);
-            webRTCConnection.on("close",closeHandler);
         }
         return ()=>
         {
             if(webRTCConnection)
             {
                 webRTCConnection.off("open",connectionOpenHandler);
-                webRTCConnection.off("connection",connectionHandler);
-                webRTCConnection.off("close",closeHandler);
             }
         }
     },[webRTCConnection,dispatch]);

@@ -80,16 +80,10 @@ export default function Question()
             dispatch(setQuestiondetails(questionDetails));
             dispatch(setQuestionModal({type:"CONNECTION",message:"Connecting to a Client",display:true}));
           }
-          const closeHandler =  async ()=>
-          {
-            dispatch(setUserStatus(USER_STATUS.ACTIVE));
-            navigate("/home");
-          }
        if(webRTCConnection)
        {          
           webRTCConnection.on("open",connectionOpenHandler);
           webRTCConnection.on("connection",connectionHandler);
-          webRTCConnection.on("close",closeHandler);
        }
        return ()=>
        {
@@ -97,7 +91,6 @@ export default function Question()
           {
             webRTCConnection.off("open",connectionOpenHandler);
             webRTCConnection.off("connection",connectionHandler);
-            webRTCConnection.off("close",closeHandler);
           }
        }
     },[webRTCConnection,dispatch]);

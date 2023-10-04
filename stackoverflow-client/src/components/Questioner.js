@@ -1,14 +1,20 @@
 // Questioner.js
 import React from 'react';
 import { useSelector,useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { setPeerConnection,setTypeOfUser} from '../redux/actions';
 
 function Questioner({ id, name, rating, secret,questionDetails}) {
   const webRTCConnection = useSelector(state=>state.webRTCConnection);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const buttonClickHandler = async (e)=>
   {
     e.preventDefault();
-    webRTCConnection.connect(secret);
+    const connection = webRTCConnection.connect(secret);
+    dispatch(setPeerConnection(connection));
+    dispatch(setTypeOfUser("ANSWERER"));
+    navigate("/chat");
   } 
   return (
     <div className="questioner-container">

@@ -3,7 +3,7 @@ import React, { useEffect,useRef} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Protect from '../components/Protect';
 import { setFirstRemoteMessage, setMessages, setPeerConnection,setQuestiondetails,setRecievedRewardMessage,setRecievedRewardRating,setRemoteClientName, setTypeOfUser, setUserStatus} from '../redux/actions';
-import { changeUserStatusHandler, statusCodeCheck,updateRatingHandler} from '../Utils/Utils';
+import {statusCodeCheck,updateRatingHandler} from '../Utils/Utils';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
@@ -28,7 +28,6 @@ function Chat() {
   {
     return ()=>
     {
-        changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"");
         dispatch(setMessages([]));
         if(peerConnection)
         {
@@ -50,6 +49,7 @@ function Chat() {
     }
     const closeEventListener = async (data)=>
     {
+      console.log("closedEventListener");
       if(userType=="ANSWERER")
       {
           if(recievedRewardRating==0)
@@ -69,7 +69,10 @@ function Chat() {
                 dispatch(setRecievedRewardMessage("User rewarded with rating : "+recievedRewardRating));
               }
           }
+          
       }
+      dispatch(setUserStatus({status : USER_STATUS.ACTIVE,id:""}));
+      navigate("/home");
       if(webRTCConnection)
       {
         webRTCConnection.destroy();
