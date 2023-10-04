@@ -7,7 +7,7 @@ import { setAnswerError, setAnswerSocket, setQuestioners,setWebRTCConnection } f
 import {changeUserStatusHandler, getUsersData} from '../Utils/Utils';
 import io from 'socket.io-client';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
-import { useNavigate } from 'react-router-dom';
+import Peer from 'peerjs';
 export default function Answer()
 {    
     const dispatch = useDispatch();

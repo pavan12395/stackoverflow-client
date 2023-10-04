@@ -18,7 +18,6 @@ export default function Question()
     const questionRatingRewardRef = useRef();
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
     const questionModal = useSelector(state=>state.questionModal);
-    const peerConnection = useSelector(state=>state.peerConnection);
     const accessToken = useSelector(state=>state.accessToken);
     const refreshToken = useSelector(state=>state.refreshToken);
     const dispatch = useDispatch();
