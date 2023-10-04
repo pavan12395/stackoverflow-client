@@ -14,37 +14,36 @@ export default function Home()
   const refreshToken = useSelector(state=>state.refreshToken);
   const dispatch = useDispatch();
   const recievedRewardMessage = useSelector(state=>state.recievedRewardMessage);
-  console.log(recievedRewardMessage);
+  const navigate = useNavigate();
+  useEffect(()=>
+  {
+    if(user){
+      const activateUserStatus = async ()=>
+      {
+        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
+      }
+      activateUserStatus();
+    }
+  },[grpcClient,user]);
   const modalClose = (e)=>
   {
     e.preventDefault();
     dispatch(setRecievedRewardMessage(""));
   }
-  const navigate = useNavigate();
-  useEffect(()=>
-    {
-      if(user){
-        const activateUserStatus = async ()=>
-        {
-            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
-        }
-        activateUserStatus();
-      }
-    },[grpcClient,user,accessToken,refreshToken])
-    if(!user)
-    {
-        return <Protect/>
-    }
-    const questionClickHandler = (e)=>
-    {
-      e.preventDefault();
-      navigate("/question");
-    }
-    const answerClickHandler = (e)=>
-    {
-      e.preventDefault();
-      navigate("/answer");
-    }
+  const questionClickHandler = (e)=>
+  {
+    e.preventDefault();
+    navigate("/question");
+  }
+  const answerClickHandler = (e)=>
+  {
+    e.preventDefault();
+    navigate("/answer");
+  }
+  if(!user)
+  {
+    return <Protect/>
+  }
     return (
         <div className="home-container">
           <div className="centered-content">
