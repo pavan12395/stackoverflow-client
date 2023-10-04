@@ -62,11 +62,9 @@ export default function Question()
           }
           catch(e)
           {
-            console.log(e);
           }
           dispatch(setWebRTCConnection(null));
           const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
-          console.log(response);
           dispatch(setQuestionModal(null));
        }
        
@@ -75,7 +73,6 @@ export default function Question()
     {
         const connectionHandler = async (connection)=>
           {
-             console.log("Remote Client Connected!");
              await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
              dispatch(setPeerConnection(connection));
              dispatch(setTypeOfUser("QUESTIONER"));
