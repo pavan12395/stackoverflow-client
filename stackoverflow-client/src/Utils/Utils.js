@@ -274,3 +274,20 @@ export async function updateRatingHandler(client,reward,accessToken,refreshToken
     console.log(response);
     return response;
 }
+
+export function validateQuestionDetails(questionTitle,questionDescription,rewardRating)
+{
+    console.log(typeof questionTitle,typeof questionDescription,typeof rewardRating);
+    if(!questionTitle || questionTitle.length == 0)
+    {
+        return "Question title is Empty!";
+    }
+    else if(!questionDescription || questionDescription.length == 0)
+    {
+        return "Question Description is Empty!";
+    }
+    else if(rewardRating==0.0)
+    {
+        return "Reward Amount should be More than 0";
+    }
+}

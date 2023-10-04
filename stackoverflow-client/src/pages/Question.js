@@ -1,64 +1,75 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useRef} from 'react';
 import {useSelector,useDispatch} from 'react-redux';
 import Protect from '../components/Protect';
-import { setQuestionTitle,setQuestionDescription,setRatingReward,setQuestionModal, setPeerConnection, setQuestiondetails, setTypeOfUser} from '../redux/actions';
+import {setQuestionModal, setPeerConnection, setQuestiondetails, setTypeOfUser} from '../redux/actions';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
 import Peer from 'peerjs';
-import { changeUserStatusHandler } from '../Utils/Utils';
+import { changeUserStatusHandler, validateQuestionDetails } from '../Utils/Utils';
 import {setWebRTCConnection} from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
-import { FaWindowRestore } from 'react-icons/fa';
 export default function Question()
 {
     const navigate = useNavigate();
     const user = useSelector(state=>state.user);
     const grpcClient = useSelector(state=>state.grpcClient);
-    const questionTitle = useSelector(state=>state.questionTitle);
-    const questionDescription = useSelector(state=>state.questionDescription);
-    const questionRatingReward = useSelector(state=>state.questionRatingReward);
+    const questionTitleRef = useRef();
+    const questionDescriptionRef = useRef();
+    const questionRatingRewardRef = useRef();
     const webRTCConnection = useSelector(state=>state.webRTCConnection);
     const questionModal = useSelector(state=>state.questionModal);
     const peerConnection = useSelector(state=>state.peerConnection);
-    const questionDetails = useSelector(state=>state.questionDetails);
     const accessToken = useSelector(state=>state.accessToken);
     const refreshToken = useSelector(state=>state.refreshToken);
     const dispatch = useDispatch();
-    const destroyState = ()=>
+    useEffect(()=>
     {
-        dispatch(setQuestionDescription(""));
-        dispatch(setQuestionTitle(""));
-        dispatch(setQuestionModal(""));
-        dispatch(setRatingReward(0));
-    }
+      return ()=>
+      {
+        dispatch(setQuestionModal(null));
+      }
+    },[]);
     const buttonClickHandler = (e)=>
     {
       e.preventDefault();
-       if(questionTitle=="" || questionDescription=="" || questionRatingReward==0.0)
-       {
-          alert("Invalid values");
-          return;
-       }
-        console.log("Clicked!");
+      const validationError = validateQuestionDetails(questionTitleRef.current.value,questionDescriptionRef.current.value,questionRatingRewardRef.current.value);
+      if(!validationError || validationError.length==0)
+      {
         const newPeer = new Peer();
         dispatch(setWebRTCConnection(newPeer));
+      }
+      else
+      {
+         dispatch(setQuestionModal({type:"VALIDATION",message:validationError,display:true}));
+      }
     }
     const modalCloseHandler = async (e)=>
     {
        e.preventDefault();
-       console.log("Clicked!");
-       try
+       if(!questionModal)
        {
-        webRTCConnection.destroy();
+          return;
        }
-       catch(e)
+       else if(questionModal.type=="VALIDATION")
        {
-        console.log(e);
+        dispatch(setQuestionModal(null));
        }
-       dispatch(setWebRTCConnection(null));
-       const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
-       console.log(response);
-       dispatch(setQuestionModal(""));
+       else if(questionModal.type=="CONNECTION")
+       {
+          try
+          {
+            webRTCConnection.destroy();
+          }
+          catch(e)
+          {
+            console.log(e);
+          }
+          dispatch(setWebRTCConnection(null));
+          const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
+          console.log(response);
+          dispatch(setQuestionModal(null));
+       }
+       
     }
     useEffect(()=>
     {
@@ -68,34 +79,22 @@ export default function Question()
              await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
              dispatch(setPeerConnection(connection));
              dispatch(setTypeOfUser("QUESTIONER"));
-             destroyState();
              navigate("/chat");
           };
           const connectionOpenHandler = async (id)=>
           {
-             console.log("Opened");
-            const questionDetails = {title : questionTitle,description:questionDescription,rewardRating:questionRatingReward};
+            const questionDetails = {title : questionTitleRef.current.value,description:questionDescriptionRef.current.value,rewardRating:questionRatingRewardRef.current.value};
+            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id,JSON.stringify(questionDetails));
             dispatch(setQuestiondetails(questionDetails));
-            const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.QUESTION,id,JSON.stringify(questionDetails));
-            console.log(response);
-            dispatch(setQuestionModal("Waiting for Connection!"));
+            dispatch(setQuestionModal({type:"CONNECTION",message:"Connecting to a Client",display:true}));
           }
           const connectionCloseHandler = async ()=>
           {
-            console.log("Closed the connection!");
-            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
-            if(peerConnection){
-            peerConnection.close();
-            }
-            dispatch(setPeerConnection(null));
-            destroyState();
-            navigate("/home");
+            dispatch(setWebRTCConnection(null));
+            await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"",null);
           }
-      console.log("Executing 1",webRTCConnection);
        if(webRTCConnection)
-       {
-          console.log("Executing");
-          
+       {          
           webRTCConnection.on("open",connectionOpenHandler);
           webRTCConnection.on("connection",connectionHandler);
           webRTCConnection.on("close",connectionCloseHandler)
@@ -109,25 +108,7 @@ export default function Question()
             webRTCConnection.off("connection",connectionHandler);
           }
        }
-    },[webRTCConnection,dispatch,grpcClient,questionDetails,questionTitle,questionDescription,questionRatingReward,accessToken,refreshToken]);
-    useEffect(()=>
-    {
-      const questionCleanUp = async (e)=>
-      {
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
-          if(webRTCConnection)
-          {
-            webRTCConnection.destroy();
-          }
-          dispatch(setWebRTCConnection(null));
-          destroyState();
-      }
-      window.addEventListener("beforeunload",questionCleanUp);
-      return ()=>
-      {
-        window.removeEventListener("beforeunload",questionCleanUp);
-      }
-    },[accessToken,refreshToken]);
+    },[webRTCConnection,dispatch,grpcClient,accessToken,refreshToken]);
     if(!user)
     {
         return <Protect/>
@@ -141,8 +122,7 @@ export default function Question()
               type="text"
               id="questionTitle"
               name="questionTitle"
-              value={questionTitle}
-              onChange={(e)=>{dispatch(setQuestionTitle(e.target.value))}}
+              ref={questionTitleRef}
               required
             /><br /><br />
     
@@ -150,8 +130,7 @@ export default function Question()
             <textarea
               id="questionDescription"
               name="questionDescription"
-              value={questionDescription}
-              onChange={(e)=>{dispatch(setQuestionDescription(e.target.value))}}
+              ref={questionDescriptionRef}
               rows="4"
               cols="50"
               required
@@ -162,14 +141,23 @@ export default function Question()
               type="number"
               step="0.01"
               id="ratingReward"
-              value={questionRatingReward}
+              ref={questionRatingRewardRef}
               name="ratingReward"
-              onChange={(e)=>{dispatch(setRatingReward(e.target.value))}}
               required
             /><br /><br />
             <button type="submit" onClick={buttonClickHandler}>Connect!</button>
-            <Modal isOpen={questionModal!=""} message={questionModal} onClose={modalCloseHandler} displayClose={true}/>
+            <Modal isOpen={questionModal!=null} message={questionModal ? questionModal.message : ""} onClose={modalCloseHandler} displayClose={!questionModal ? false : questionModal.display}/>
           </form>
         </div>
       );
 }
+
+/*
+Todo
+
+Invalid values --> more elaborate and questions syntax search and mention the reason in modal
+Making refs
+arrive at a particular page one call to change the status
+Responsibility of destroying the peer will be handed over to Chat.js
+Navigate to home responsibility handed to Chat.js
+*/

@@ -10,9 +10,6 @@ import {
     SET_NEWSKILL_DIFFICULTY,
     SET_AVAILABLESKILLOPTIONS,
     SET_GRPC_CLIENT,
-    SET_QUESTION_TITLE,
-    SET_QUESTION_DESCRIPTION,
-    SET_RATING_REWARD,
     SET_QUESTION_MODAL,
     SET_PEER_CONNECTION,
     SET_MESSAGES,
@@ -41,10 +38,7 @@ import {
     newSkillDifficulty : "",
     availableSkillOptions : initSkills,
     grpcClient : null,
-    questionTitle : "",
-    questionDescription : "",
-    questionRatingReward : 0.0,
-    questionModal : "",
+    questionModal : null,
     peerConnection : null,
     messages : [],
     questionDetails : null,
@@ -117,18 +111,6 @@ import {
       case SET_GRPC_CLIENT:
         return{
           ...state,grpcClient : action.payload
-        }
-      case SET_QUESTION_TITLE:
-        return{
-          ...state,questionTitle:action.payload
-        }
-      case SET_QUESTION_DESCRIPTION:
-        return{
-          ...state,questionDescription:action.payload
-        }
-      case SET_RATING_REWARD:
-        return{
-          ...state,questionRatingReward:action.payload
         }
       case SET_QUESTION_MODAL:
         return{
