@@ -8,7 +8,7 @@ import {validateQuestionDetails } from '../Utils/Utils';
 import {setWebRTCConnection} from '../redux/actions';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
-import { CONNECTION, CONNECTION_WAIT_MESSAGE, EMPTY_STRING, QUESTIONER, VALIDATION, WEB_RTC_CONNECTION_EVENT, WEB_RTC_OPEN_EVENT } from '../Constants/constants';
+import { CHAT_ROUTE, CONNECTION, CONNECTION_WAIT_MESSAGE, EMPTY_STRING, QUESTIONER, VALIDATION, WEB_RTC_CONNECTION_EVENT, WEB_RTC_OPEN_EVENT } from '../Constants/constants';
 export default function Question()
 {
     const navigate = useNavigate();
@@ -71,7 +71,7 @@ export default function Question()
           {
              dispatch(setPeerConnection(connection));
              dispatch(setTypeOfUser(QUESTIONER));
-             navigate("/chat");
+             navigate(CHAT_ROUTE);
           };
           const connectionOpenHandler = async (id)=>
           {

@@ -1,4 +1,4 @@
-import { GRPC_SERVER_END_POINT, QUESTION_DESC_EMPTY, QUESTION_REWARD_EMPTY, QUESTION_TITLE_EMPTY, Skills } from '../Constants/constants';
+import { GRPC_SERVER_END_POINT, JWT_EXPIRED_MESSAGE, QUESTION_DESC_EMPTY, QUESTION_REWARD_EMPTY, QUESTION_TITLE_EMPTY, Skills } from '../Constants/constants';
 import {StackOverflowClient} from '../proto/stackoverflow_grpc_web_pb';
 import {SignUpRequest,CheckTokenRequest,Authorization,RequestHeaders,GetTokenRequest,LogoutRequest,LoginRequest,ChangeUserStatusRequest,GetUserDetailsByIdRequest,UpdateRatingRequest} from '../proto/stackoverflow_pb';
 import {SKILL_NAME,SKILL_DIFFICULTY,Skill} from '../proto/stackoverflow_pb';
@@ -11,7 +11,7 @@ export function getGrpcClient()
 export function checkJWTExpired(response)
 {
     const errorMessage = response.responseheaders.errormessagesList[0];
-    if(errorMessage.startsWith("JWT expired at"))
+    if(errorMessage.startsWith(JWT_EXPIRED_MESSAGE))
     {
         return true;
     }

@@ -36,3 +36,4 @@ export const GRPC_SERVER_END_POINT = "http://localhost:9090";
 export const QUESTION_TITLE_EMPTY = "Question title is Empty!";
 export const QUESTION_DESC_EMPTY = "Question Description is Empty!";
 export const QUESTION_REWARD_EMPTY = "Reward Amount should be More than 0";
+export const JWT_EXPIRED_MESSAGE = "JWT expired at";

@@ -2,7 +2,7 @@
 import React from 'react';
 import { useSelector,useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ANSWER_ROUTE, CHAT_ROUTE } from '../Constants/constants';
+import { ANSWERER, CHAT_ROUTE } from '../Constants/constants';
 import { setPeerConnection,setTypeOfUser} from '../redux/actions';
 
 function Questioner({ id, name, rating, secret,questionDetails}) {
@@ -14,7 +14,7 @@ function Questioner({ id, name, rating, secret,questionDetails}) {
     e.preventDefault();
     const connection = webRTCConnection.connect(secret);
     dispatch(setPeerConnection(connection));
-    dispatch(setTypeOfUser(ANSWER_ROUTE));
+    dispatch(setTypeOfUser(ANSWERER));
     navigate(CHAT_ROUTE);
   } 
   return (

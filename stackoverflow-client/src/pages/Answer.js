@@ -75,6 +75,7 @@ export default function Answer()
     {
         const connectionOpenHandler = async (id)=>
         {
+            console.log("fired");
             dispatch(setUserStatus({status : USER_STATUS.ANSWER,id: id}));
         }
         if(webRTCConnection)
