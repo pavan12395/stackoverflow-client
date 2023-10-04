@@ -7,7 +7,6 @@ import { setAnswerError, setAnswerSocket, setQuestioners,setWebRTCConnection } f
 import {changeUserStatusHandler, getUsersData} from '../Utils/Utils';
 import io from 'socket.io-client';
 import {USER_STATUS} from '../proto/stackoverflow_pb';
-import Peer, { SocketEventType } from 'peerjs';
 import { useNavigate } from 'react-router-dom';
 export default function Answer()
 {    
@@ -25,86 +24,61 @@ export default function Answer()
         e.preventDefault();
         dispatch(setAnswerError(""));
     }
-    const navigate = useNavigate();
+    useEffect(()=>
+    {
+        const newPeer = new Peer();
+        dispatch(setWebRTCConnection(newPeer));
+        changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ANSWER,"","");
+    },[dispatch,grpcClient,accessToken,refreshToken]);
     useEffect(()=>
     {
         const socket = io('http://localhost:4000', { transports : ['websocket'] });
         dispatch(setAnswerSocket(socket));
         return ()=>
         {
-            
             dispatch(setAnswerSocket(null));
+            dispatch(setQuestioners([]));
+            dispatch(setAnswerError(""));
         }
     },[]);
     useEffect(()=>
     {
         if(answerSocket)
         {
-            const connectionHandler = ()=>
-            {
-                dispatch(setAnswerError(""));
-                console.log("Connected!");
-            }
             const connectionFailedHandler = ()=>
             {
                 dispatch(setAnswerError("Cant connect to WebSockets Server"));
             }
             const usersHandler = async (data)=>
             {
-                console.log("Recieved Data! ",data);
                 const userData = await getUsersData(grpcClient,data);
-                console.log(userData);
                 dispatch(setQuestioners(userData));
             }
             const welcomeHandler = async (data)=>
             {
-                console.log("Recieved Data on Welcome ! ",data);
                 const userData = await getUsersData(grpcClient,data);
-                console.log(userData);
                 dispatch(setQuestioners(userData));
             }
-            answerSocket.on("connect",connectionHandler);
             answerSocket.on("users",usersHandler);
             answerSocket.on("welcome",welcomeHandler);
             answerSocket.on("connect_error",connectionFailedHandler);
             return ()=>
             {
-                answerSocket.destroy();
+                answerSocket.off("users",usersHandler);
+                answerSocket.off("welcome",welcomeHandler);
+                answerSocket.off("connect_error",connectionFailedHandler);
             }
        }
     },[dispatch,answerSocket,grpcClient]);
-    useEffect(()=>{
-    async function effectCall()
-    {
-            const newPeer = new Peer();
-            dispatch(setWebRTCConnection(newPeer));
-            const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ANSWER,"","");
-            console.log(response);
-    }
-    effectCall();
-    const unloadEventListener = async ()=>
-    {
-        dispatch(setQuestioners([]));
-        console.log("Connected Closed");
-        dispatch(setWebRTCConnection(null));
-        await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
-    }
-    window.addEventListener("beforeunload",unloadEventListener);
-    return ()=>
-    {
-        window.removeEventListener("beforeunload",unloadEventListener);
-    }
-    },[dispatch,grpcClient,accessToken,refreshToken]);
+    
     useEffect(()=>
     {
         const connectionHandler = async ()=>
         {
-            console.log("Remote Client Connected!");
             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
         }
         const closeHandler = async ()=>
         {
-            console.log("Closed the connection!");
             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,"","");
         }
         if(webRTCConnection)

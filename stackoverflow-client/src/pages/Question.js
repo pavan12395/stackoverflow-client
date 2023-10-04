@@ -64,7 +64,7 @@ export default function Question()
           {
           }
           dispatch(setWebRTCConnection(null));
-          const response = await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
+          changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.ACTIVE,null);
           dispatch(setQuestionModal(null));
        }
        
@@ -73,7 +73,6 @@ export default function Question()
     {
         const connectionHandler = async (connection)=>
           {
-             await changeUserStatusHandler(grpcClient,accessToken,refreshToken,USER_STATUS.CALL,"","");
              dispatch(setPeerConnection(connection));
              dispatch(setTypeOfUser("QUESTIONER"));
              navigate("/chat");
