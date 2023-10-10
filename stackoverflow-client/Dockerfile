@@ -4,6 +4,14 @@ FROM node:14
 # Set working directory in the container
 WORKDIR /app
 
+# Define build-time variables
+ARG REACT_APP_WEB_SOCKET_END_POINT
+ARG REACT_APP_ENVOY_END_POINT
+
+# Set environment variables
+ENV REACT_APP_WEB_SOCKET_END_POINT=$REACT_APP_WEB_SOCKET_END_POINT
+ENV REACT_APP_ENVOY_END_POINT=$REACT_APP_ENVOY_END_POINT
+
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
