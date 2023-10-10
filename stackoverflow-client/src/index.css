@@ -396,12 +396,14 @@ button {
 /* Basic CSS for the chat application */
 
 .chat-container {
+  position: absolute;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin-top: 10%;
+  top: 60%;
+  left : 50%;
+  transform: translate(-50%,-50%);
 }
 
 .chat-messages {
