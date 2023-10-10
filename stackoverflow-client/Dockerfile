@@ -2,8 +2,8 @@
 FROM node:14
 
 # Set environment variables
-ENV REACT_APP_GRPC_SERVER_END_POINT="http://localhost:9090"
-ENV REACT_APP_WEB_SOCKET_END_POINT="http://localhost:4000"
+ENV REACT_APP_ENVOY_END_POINT=$REACT_APP_ENVOY_END_POINT
+ENV REACT_APP_WEB_SOCKET_END_POINT=$REACT_APP_WEB_SOCKET_END_POINT
 
 # Set the working directory in the container
 WORKDIR /app
