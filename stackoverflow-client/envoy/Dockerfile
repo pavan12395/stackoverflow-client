@@ -1,12 +1,16 @@
 FROM envoyproxy/envoy-dev:latest
 
-ARG GRPC_SOCKET_ADDRESS=host.docker.internal
-ARG GRPC_SOCKET_PORT=8080
-ARG ENVOY_PROXY_PORT=9090
+# Copy your envoy.yaml into the container
 COPY envoy.yaml /etc/envoy/envoy.yaml
 
-RUN sed -ie "s/ENVOY_PROXY_PORT/$ENVOY_PROXY_PORT/g" /etc/envoy/envoy.yaml
-RUN sed -ie "s/GRPC_SOCKET_ADDRESS/$GRPC_SOCKET_ADDRESS/g" /etc/envoy/envoy.yaml
-RUN sed -i "s/GRPC_SOCKET_PORT/$GRPC_SOCKET_PORT/g" /etc/envoy/envoy.yaml
+# Create a shell script to perform sed replacements and start envoy
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-RUN chmod go+r /etc/envoy/envoy.yaml
+# Set the default values for your environment variables
+ENV GRPC_SOCKET_ADDRESS=host.docker.internal
+ENV GRPC_SOCKET_PORT=8080
+ENV ENVOY_PROXY_PORT=9090
+
+# Specify the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
