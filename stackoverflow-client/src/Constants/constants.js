@@ -1,8 +1,3 @@
-
-
-console.log("Environment Variables Read are  : ")
-console.log("REACT_APP_WEB_SOCKET_END_POINT : "+process.env.REACT_APP_WEB_SOCKET_END_POINT)
-console.log("REACT_APP_ENVOY_END_POINT : "+process.env.REACT_APP_ENVOY_END_POINT)
 export const difficultyOptions = ['EASY', 'MEDIUM', 'HARD'];
 export const initSkills = ['JAVA','PYTHON','MYSQL']
 export const QUESTION_ROUTE = "/question";
