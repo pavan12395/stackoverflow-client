@@ -1,13 +1,7 @@
 # Use an official Node.js runtime as the base image
 FROM node:14
 
-# Set environment variables
-ARG REACT_APP_ENVOY_END_POINT
-ENV REACT_APP_ENVOY_END_POINT=$REACT_APP_ENVOY_END_POINT
-ARG REACT_APP_WEB_SOCKET_END_POINT
-ENV REACT_APP_WEB_SOCKET_END_POINT=$REACT_APP_WEB_SOCKET_END_POINT
-
-# Set the working directory in the container
+# Set working directory in the container
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the container
@@ -26,4 +20,4 @@ RUN npm run build
 EXPOSE 80
 
 # Serve the built React app with a simple HTTP server
-CMD ["npx", "http-server", "-p", "80", "./build"]
+ENTRYPOINT ["npx", "http-server", "-p", "80", "./build"]
