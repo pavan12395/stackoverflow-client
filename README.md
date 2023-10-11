@@ -4,16 +4,19 @@
 An remote peer to peer application where users can ask questions or answer questions implemented by using WebRTC and WebSockets.
 
 ### TechStack
-Frontend :- React,grpc-web,Docker
 
-GrpcServer :- protobuf,grpc,Spring Boot,Docker
+| **Component**        | **Technology**                      |
+|-----------------------|-------------------------------------|
+| Frontend              | React, grpc-web, Docker             |
+| GrpcServer            | protobuf, grpc, Spring Boot, Docker |
+| WebSocketsServer      | NodeJS                              |
+| Database              | MySQL                               |
 
-WebSocketsServer :- NodeJS
-
-Database :- MySQL
 
 
 ## Components Overview
+
+![Screenshot](image.png)
 
 ### Database 
 
