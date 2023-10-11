@@ -1,10 +1,8 @@
 # Use an official Node.js runtime as the base image
 FROM node:14
 
-# Set working directory in the container
+# Set the working directory in the container
 WORKDIR /app
-
-
 
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
@@ -15,14 +13,14 @@ RUN npm install
 # Copy the entire application directory to the container
 COPY . .
 
+# Build the React application (assumes you have a build script in your package.json)
+RUN npm run build
 
+# Install a simple web server to serve the build files
+RUN npm install -g serve
+
+# Expose the port that the server will listen on
 EXPOSE 3000
 
-CMD export REACT_APP_WEB_SOCKET_END_POINT="http://${WEB_SOCKET_HOST}:${WEB_SOCKET_PORT}/" && \
-    export REACT_APP_ENVOY_END_POINT="http://${ENVOY_HOST}:${ENVOY_PORT}/" && npm start
-
-# Serve the built React app with a simple HTTP server
-
-
-
-# WEB_SOCKET_HOST , WEB_SOCKET_PORT , ENVOY_HOST , ENVOY_PORT are the environment variables took in Frontend Application
+# Start the server to serve the build files
+CMD ["serve", "-s", "build"]
