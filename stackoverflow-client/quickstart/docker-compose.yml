@@ -1,0 +1,55 @@
+version: '3'
+name: "mlh_project"
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_database
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  node:
+    image: websockets:1
+    container_name: node-server
+    environment:
+      API_KEY: ${API_KEY}
+      SERVER_PORT: ${NODE_PORT}
+      WEB_SOCKET_PORT: ${WEB_SOCKET_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER_NAME: ${DB_USER_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: mysql
+      DB_PORT: ${DB_PORT}
+    ports:
+      - "${NODE_PORT}:${NODE_PORT}"
+      - "${WEB_SOCKET_PORT}:${WEB_SOCKET_PORT}"
+  grpc-server:
+    image: grpcserver:1
+    container_name: grpc-server
+    environment:
+      GRPC_SERVER_PORT: ${GRPC_PORT}
+      NODE_PORT: ${NODE_PORT}
+      NODE_HOST: node
+      API_KEY: ${API_KEY}
+      database_driver: ${database_driver}
+      DB_HOST: mysql  # Use the service name defined in the Compose file
+      DB_PORT: ${DB_PORT}  # Use the port exposed by the MySQL container
+      DB_NAME: ${DB_NAME}
+      DB_USER_NAME: ${DB_USER_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+  envoyproxy:
+    image: envoy-proxy:1
+    container_name: envoyproxy
+    environment:
+      GRPC_SOCKET_ADDRESS: grpc-server
+      GRPC_SOCKET_PORT: ${GRPC_PORT}
+      ENVOY_PROXY_PORT: ${ENVOY_PORT}
+    ports:
+      - "${ENVOY_PORT}:${ENVOY_PORT}"
+  frontend:
+    image: frontend:1
+    container_name: frontend
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    
