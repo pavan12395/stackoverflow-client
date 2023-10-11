@@ -18,7 +18,7 @@ An remote peer to peer application where users can ask questions or answer quest
 For setting up the application , Install docker compose on your local system , Execute the following commands
 
 ```
-cd quickstart
+cd stackoverflow-client/quickstart
 docker-compose up
 ```
 
