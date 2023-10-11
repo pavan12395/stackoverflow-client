@@ -14,9 +14,6 @@ import { useNavigate } from 'react-router-dom';
 import {USER_STATUS} from './proto/stackoverflow_pb';
 import { ACCESS_TOKEN, ANSWER_ROUTE, CHAT_ROUTE, EMPTY_STRING, HOME_ROUTE, LOGIN_ROUTE, QUESTION_ROUTE, REFRESH_TOKEN, SIGNUP_ROUTE,SESSION_EXPIRED_MESSAGE} from './Constants/constants';
 function App() {
-console.log("Environment Variables Read are  : ")
-console.log("REACT_APP_WEB_SOCKET_END_POINT : "+process.env.REACT_APP_WEB_SOCKET_END_POINT)
-console.log("REACT_APP_ENVOY_END_POINT : "+process.env.REACT_APP_ENVOY_END_POINT)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const accessToken = useSelector((state)=>state.accessToken);
