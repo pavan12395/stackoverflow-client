@@ -1,4 +1,4 @@
-# stackoverflow-client
+# Stackoverflow-client
 
 ## Description
 An remote peer to peer application where users can ask questions or answer questions implemented by using WebRTC and WebSockets.
@@ -65,7 +65,7 @@ Makes a call to WebSockets Server when a user status is changed from QUESTION or
 An envoy-proxy for handling incoming grpc-web traffic from the frontend Application to GrpcServer
 
 
-### stackoverflow-client
+### Stackoverflow-client
 
 The frontend React application which makes calls to GrpcServer through Envoy-proxy.
 
