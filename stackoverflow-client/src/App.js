@@ -26,8 +26,8 @@ console.log("REACT_APP_ENVOY_END_POINT : "+process.env.REACT_APP_ENVOY_END_POINT
   const questionDetails = useSelector(state=>state.questionDetails);
   useEffect(()=>
   {
-      dispatch(setAccessToken(window.localStorage.getItem(ACCESS_TOKEN)));
-      dispatch(setRefreshToken(window.localStorage.getItem(REFRESH_TOKEN)));
+      dispatch(setAccessToken(window.sessionStorage.getItem(ACCESS_TOKEN)));
+      dispatch(setRefreshToken(window.sessionStorage.getItem(REFRESH_TOKEN)));
       const client = getGrpcClient();
       dispatch(setGrpcClient(client));
   },[]);
@@ -48,8 +48,8 @@ console.log("REACT_APP_ENVOY_END_POINT : "+process.env.REACT_APP_ENVOY_END_POINT
   },[grpcClient,userStatus,questionDetails,accessToken,refreshToken]);
   useEffect(()=>
   {
-     window.localStorage.setItem(ACCESS_TOKEN,accessToken);
-     window.localStorage.setItem(REFRESH_TOKEN,refreshToken);
+     window.sessionStorage.setItem(ACCESS_TOKEN,accessToken);
+     window.sessionStorage.setItem(REFRESH_TOKEN,refreshToken);
   },[accessToken,refreshToken]);
   useEffect(()=>
   {
