@@ -1,5 +1,9 @@
 #!/bin/sh
 
+echo $GRPC_SOCKET_ADDRESS
+echo $GRPC_SOCKET_PORT
+echo $ENVOY_PROXY_PORT
+
 # Perform sed replacements in the envoy.yaml file
 sed -i "s/GRPC_SOCKET_ADDRESS/$GRPC_SOCKET_ADDRESS/g" /etc/envoy/envoy.yaml
 sed -i "s/GRPC_SOCKET_PORT/$GRPC_SOCKET_PORT/g" /etc/envoy/envoy.yaml

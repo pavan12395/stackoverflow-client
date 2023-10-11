@@ -136,13 +136,3 @@ export default function Question()
         </div>
       );
 }
-
-/*
-Todo
-
-Invalid values --> more elaborate and questions syntax search and mention the reason in modal
-Making refs
-arrive at a particular page one call to change the status
-Responsibility of destroying the peer will be handed over to Chat.js
-Navigate to home responsibility handed to Chat.js
-*/
