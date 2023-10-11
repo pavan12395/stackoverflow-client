@@ -22,7 +22,7 @@ git clone https://github.com/pavan12395/stackoverflow-client.git
 cd stackoverflow-client/stackoverflow-client/quickstart
 docker-compose up
 ```
-
+Open up localhost:8086 to access the application
 
 ## Components Overview
 
