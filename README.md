@@ -26,6 +26,12 @@ Open up localhost:8086 to access the application
 
 ## Components Overview
 
+
+### Architecture
+
+<img width="932" alt="Screenshot 2023-10-11 at 2 47 17 PM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/31f942b3-5605-429b-a100-4d0c322ed0e3">
+
+
 ### Database 
 
 MySQL database stores details of users in 3 tables as follows
@@ -128,6 +134,36 @@ The frontend React application which makes calls to GrpcServer through Envoy-pro
 | `refreshToken`         | Holds the JWT refresh token obtained from the session storage of the browser, for token renewal.            |
 | `answerSocket`         | Represents the `socket.io-client` object responsible for live updates on the Answer page.                   |
 | `userStatus`           | Indicates the status of the user, helping manage user state and actions in the application.                   |
+
+
+
+## Walkthrough Demo
+
+### Users sign's up by providing details like username , password , description , Skills
+
+<img width="1792" alt="Screenshot 2023-10-15 at 7 41 08 AM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/c45ea49e-d314-47c2-ba51-03944dd6bb63">
+ 
+### User navigated to Home page on SignUp
+
+<img width="1777" alt="Screenshot 2023-10-15 at 7 41 31 AM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/d3851d96-b0ff-4c41-9ea8-fe4428c3c744">
+
+### User chooses to Question gets navigated to /question Route 
+
+<img width="1792" alt="Screenshot 2023-10-15 at 7 42 29 AM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/34194207-3df1-4efd-9988-922c509f7dce">
+<img width="1789" alt="Screenshot 2023-10-15 at 7 42 41 AM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/5e6aa03d-0f99-4dc7-9336-130ea03c63b1">
+
+### User chooses to Answer gets navigated to /answer Route where one will get live updates of Questions being asked
+
+<img width="1792" alt="Screenshot 2023-10-15 at 7 43 24 AM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/96560396-1795-4074-9bb4-8a142995aa34">
+
+### User chooses to Answer a question is routed to Chat route , opening a Connection between the both Clients
+
+<img width="1792" alt="Screenshot 2023-10-15 at 7 49 28 AM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/5c2d9777-d2f7-44bf-81b3-6eb4881ddab2">
+
+### Answerer gets rewarded and gets prompt message when questioner clicks on Reward Button
+
+<img width="1792" alt="Screenshot 2023-10-15 at 7 46 42 AM" src="https://github.com/pavan12395/stackoverflow-client/assets/60562210/38351cda-c1f2-44f8-882b-ee119995c633">
+ 
 
 
 
