@@ -1,7 +1,7 @@
 # Stackoverflow-client
 
 ## Description
-An remote peer to peer application where users can ask questions or answer questions implemented by using WebRTC and WebSockets.
+A remote peer to peer application where users can ask questions or answer questions implemented by using WebRTC and WebSockets.
 
 ### TechStack
 
